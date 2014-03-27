@@ -3,11 +3,12 @@ var EIS = window.EIS || {};
 (function ($, _, Modernizr, less, debug) {
   "use strict";
 
+  debug.time("Start Up");
+
   _.extend(EIS, {
   });
 
   $(function() {
-    debug.time("Start Up");
 
     /*---------- Shim to treat CSS panel as Less ----------*/
     $('head style[type="text/css"]').attr('type', 'text/less');
