@@ -1,7 +1,7 @@
+var EIS = window.EIS || {};
+
 (function ($, _, Modernizr, less, debug) {
   "use strict";
-
-  var EIS = {};
 
   _.extend(EIS, {
   });
