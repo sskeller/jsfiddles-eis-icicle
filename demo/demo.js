@@ -1,9 +1,9 @@
 (function ($, _, Modernizr, less, debug) {
   "use strict";
 
-  var s5e = {};
+  var EIS = {};
 
-  _.extend(s5e, {
+  _.extend(EIS, {
   });
 
   $(function() {
