@@ -1,9 +1,8 @@
+debug.time("Start Up");
 var EIS = window.EIS || {};
 
 (function ($, _, Modernizr, less, debug) {
   "use strict";
-
-  debug.time("Start Up");
 
   _.extend(EIS, {
   });
