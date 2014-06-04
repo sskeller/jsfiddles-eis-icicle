@@ -1,0 +1,10 @@
+# Site settings
+title: Base Fiddle (Simple)
+email: scott.keller13@gmail.com
+description: "Base Fiddle with Modernizr, jQuery, Lodash, Less"
+baseurl: "/jsfiddles-base"
+url: "http://sskeller.github.io"
+
+# Build settings
+markdown: kramdown
+permalink: pretty

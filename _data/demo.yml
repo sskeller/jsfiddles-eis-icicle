@@ -1,0 +1,13 @@
+---
+name: Base Fiddle (Simple)
+description: Base Fiddle with Modernizr, jQuery, Lodash, Less
+authors:
+  - Scott Keller
+resources:
+  - //cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.2/modernizr.min.js
+  - //ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js
+  - //cdnjs.cloudflare.com/ajax/libs/lodash.js/2.4.1/lodash.min.js
+  - //cdnjs.cloudflare.com/ajax/libs/less.js/1.7.0/less.min.js
+  - //dl.dropboxusercontent.com/u/8596275/cdn/js/lib/ba-debug.min.js
+normalize_css: no
+...
