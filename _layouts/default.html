@@ -7,10 +7,6 @@
         <meta name="description" content="{{ site.data.demo.description }}">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <style type="text/css">
-          {% include demo.css %}
-        </style>
-
         {% for resource in site.data.demo.resources %}
           {% assign ext = resource | split: '?' | first | split: '.' | last %}
           {% if ext == "js" %}
@@ -19,6 +15,10 @@
             <link rel="stylesheet" href="{{ resource }}" />
           {% endif %}
         {% endfor %}
+
+        <style type="text/css">
+          {% include demo.css %}
+        </style>
 
         <script >
           {% include demo.js %}
