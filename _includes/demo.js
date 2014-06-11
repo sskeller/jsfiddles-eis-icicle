@@ -1,10 +1,10 @@
 debug.time("Start Up");
-var s5e = window.s5e || {};
+var EIS = window.EIS || {};
 
 (function ($, _, Modernizr, less, debug) {
   "use strict";
 
-  _.extend(s5e, {
+  _.extend(EIS, {
   });
 
   $(function() {
