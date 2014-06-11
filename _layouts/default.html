@@ -1,0 +1,30 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>{{ site.data.demo.name }}</title>
+        <meta name="description" content="{{ site.data.demo.description }}">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        {% for resource in site.data.demo.resources %}
+          {% assign ext = resource | split: '?' | first | split: '.' | last %}
+          {% if ext == "js" %}
+            <script src="{{ resource }}"></script>
+          {% elsif ext == "css" %}
+            <link rel="stylesheet" href="{{ resource }}" />
+          {% endif %}
+        {% endfor %}
+
+        <style type="text/css">
+          {% include demo.css %}
+        </style>
+
+        <script >
+          {% include demo.js %}
+        </script>
+    </head>
+    <body>
+      {{ content }}
+    </body>
+</html>
