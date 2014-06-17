@@ -1,6 +1,6 @@
 ---
-name: Base Fiddle (Simple)
-description: Base Fiddle with Modernizr, jQuery, Lodash, Less
+name: EIS Icicle Demo
+description: Mock up of using an Icicle chart to make and interactive Source/Fund page.
 authors:
   - Scott Keller
 resources:

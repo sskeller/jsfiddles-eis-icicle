@@ -1,8 +1,8 @@
 # Site settings
-title: Base Fiddle (Simple)
+title: EIS Icicle Demo
 email: scott.keller13@gmail.com
-description: "Base Fiddle with Modernizr, jQuery, Lodash, Less"
-baseurl: "/jsfiddles-base"
+description: "Mock up of using an Icicle chart to make and interactive Source/Fund page."
+baseurl: "/jsfiddles-eis-icicle"
 url: "http://sskeller.github.io"
 
 # Build settings

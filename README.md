@@ -1,7 +1,7 @@
-jsfiddles-base-eis
+jsfiddles-eis-icicle
 ==============
 
-Base jsFiddle for EIS used as a starting template.
+Mock up of using an Icicle chart to make and interactive Source/Fund page.
 
-[View on jsFiddle](http://jsfiddle.net/gh/get/library/pure/sskeller/jsfiddles-base-eis/tree/master/demo/)  
-[View on Github Pages](http://sskeller.github.io/jsfiddles-base-eis/)
+[View on jsFiddle](http://jsfiddle.net/gh/get/library/pure/sskeller/jsfiddles-eis-icicle/tree/master/demo/)  
+[View on Github Pages](http://sskeller.github.io/jsfiddles-eis-icicle/)
