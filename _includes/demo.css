@@ -1,4 +1,6 @@
 /* Less */
 h1 {
-    b { color: #c00; }
+  small {
+    display: block;
+  }
 }
