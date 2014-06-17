@@ -4,3 +4,7 @@ h1 {
     display: block;
   }
 }
+
+rect {
+  stroke: #fff;
+}
