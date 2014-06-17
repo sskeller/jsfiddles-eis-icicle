@@ -19,7 +19,7 @@ var EIS = window.EIS || {};
     .attr("height", height);
 
   var rect = svg.selectAll("rect");
-  var isJsFiddle = /jsfiddle[.]net$/.test(location.host);
+  var isJsFiddle = /jsfiddle[.]jshell[.]net$/.test(location.host);
   var jsonURL = isJsFiddle ? "http://sskeller.github.io/jsfiddles-eis-icicle/json/icicle.json" : "json/icicle.json";
 
   alert(jsonURL);
