@@ -102,9 +102,7 @@ var EIS = window.EIS || {};
     };
 
     var updateLegend = function(d) {
-        legendItem.transition()
-          .duration(750)
-          .style("display", function(d1) {
+        legendItem.style("display", function(d1) {
             var shouldDisplay = d === d1;
             shouldDisplay = shouldDisplay || d.parent && d.parent === d1;
             shouldDisplay = shouldDisplay || d1.parent && d1.parent === d;
