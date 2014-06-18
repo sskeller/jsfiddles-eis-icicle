@@ -5,13 +5,22 @@ var EIS = window.EIS || {};
   "use strict";
 
   _.extend(EIS, {
+    colors: [
+      colorbrewer.Blues["6"].reverse(),
+      colorbrewer.Reds["6"].reverse(),
+      colorbrewer.Greens["6"].reverse(),
+      colorbrewer.Oranges["6"].reverse(),
+      colorbrewer.Purples["6"].reverse(),
+      colorbrewer.PuRd["6"].reverse()
+    ],
+    nextColor: 0,
+    nextColors: [ 1, 1, 1, 1, 1, 1 ]
   });
 
   var width = 945;
   var height = 300;
   var x = d3.scale.linear().range([0, width]);
   var y = d3.scale.linear().range([0, height]);
-  var color = d3.scale.category20c();
   var partition = d3.layout.partition()
     .value(function(d) { return d.dollars; });
   var isJsFiddle = /^fiddle[.]jshell[.]net$/.test(location.host) || location.host === "jsfiddle.net";
@@ -43,14 +52,26 @@ var EIS = window.EIS || {};
     };
 
     var buildIcicles = function(root) {
-      rect = rect.data(partition(root))
+      rect = rect.data(partition(root).sort(function(a, b) { return b.dollars - a.dollars; }))
         .enter().append("rect")
         .attr("x", function(d) { return x(d.x); })
         .attr("y", function(d) { return y(d.y); })
         .attr("width", function(d) { return x(d.dx); })
         .attr("height", function(d) { return y(d.dy); })
         .attr("fill", function(d, i) {
-          d.color = color(d.x + d.depth);
+          if(d.depth === 0) {
+            d.color = "#bdbdbd";
+          } else if(d.children) {
+            d.colorIndex = EIS.nextColor;
+            d.color = EIS.colors[d.colorIndex][0];
+            EIS.nextColor = (EIS.nextColor + 1) % EIS.colors.length;
+          } else {
+            var parentIndex = d.parent.colorIndex;
+            d.colorIndex = EIS.nextColors[parentIndex];
+            d.color = EIS.colors[parentIndex][d.colorIndex];
+            EIS.nextColors[parentIndex] = (EIS.nextColors[parentIndex] + 1) % EIS.colors[parentIndex].length;
+          }
+
           return d.color;
         })
         .on("click", icicleClicked);

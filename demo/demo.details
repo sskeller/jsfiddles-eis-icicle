@@ -13,5 +13,6 @@ resources:
   - //code.jquery.com/ui/1.10.4/themes/smoothness/jquery-ui.css
   - //code.jquery.com/ui/1.10.4/jquery-ui.js
   - //d3js.org/d3.v3.min.js
+  - //raw.githubusercontent.com/mbostock/d3/master/lib/colorbrewer/colorbrewer.js
 normalize_css: no
 ...
