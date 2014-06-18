@@ -20,12 +20,7 @@ var EIS = window.EIS || {};
     var y = d3.scale.linear().range([0, height]);
     var color = d3.scale.category20c();
     var partition = d3.layout.partition()
-      .children(function(d) {
-        return d.children ? d.children : null;
-      })
-      .value(function(d) {
-        return d.dollars;
-      });
+      .value(function(d) { return d.dollars; });
 
     var svg = d3.select("#icicle").append("svg")
       .attr("width", width)
@@ -42,8 +37,9 @@ var EIS = window.EIS || {};
         .attr("y", function(d) { return y(d.y); })
         .attr("width", function(d) { return x(d.dx); })
         .attr("height", function(d) { return y(d.dy); })
-        .attr("fill", function(d) {
-          return color((d.children ? d : d.parent).value);
+        .attr("fill", function(d, i) {
+          d.color = color(d.x + d.depth);
+          return d.color;
         })
         .on("click", icicleClicked);
     });
