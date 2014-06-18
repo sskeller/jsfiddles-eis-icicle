@@ -1,7 +1,7 @@
 debug.time("Start Up");
 var EIS = window.EIS || {};
 
-(function ($, _, Modernizr, less, debug, Request) {
+(function ($, _, Modernizr, less, debug, d3) {
   "use strict";
 
   _.extend(EIS, {
@@ -32,6 +32,7 @@ var EIS = window.EIS || {};
     less.refreshStyles();
     /*---------- End Shim ----------*/
 
+    var data = {};
 
     var svg = d3.select("#icicle").append("svg")
       .attr("width", width)
@@ -52,7 +53,8 @@ var EIS = window.EIS || {};
     };
 
     var buildIcicles = function(root) {
-      rect = rect.data(partition(root).sort(function(a, b) { return b.dollars - a.dollars; }))
+      data = partition(root).sort(function(a, b) { return b.dollars - a.dollars; });
+      rect = rect.data(data)
         .enter().append("rect")
         .attr("x", function(d) { return x(d.x); })
         .attr("y", function(d) { return y(d.y); })
@@ -77,6 +79,22 @@ var EIS = window.EIS || {};
         .on("click", icicleClicked);
     };
 
+    var legend = d3.select("#legend");
+    var legendItem = legend.selectAll("li");
+
+    var buildLegend = function(root) {
+      legendItem = legendItem.data(data)
+        .enter().append("li");
+      legendItem
+        .attr("class", function(d) { return "depth-" + d.depth; })
+        .append("span")
+        .attr("class", "swatch")
+        .style("background-color", function(d) { return d.color; });
+      legendItem.append("span")
+        .attr("class", "swatch-label")
+        .text(function(d) { return d.name; });
+    };
+
     if(isJsFiddle) {
       $.ajax({
         url: "/gh/get/response.json/sskeller/jsfiddles-eis-icicle/tree/master/demo/",
@@ -85,15 +103,17 @@ var EIS = window.EIS || {};
         data: { 'delay': 1 },
         success: function(response) {
           buildIcicles(response);
+          buildLegend(response);
         }
       });
     } else {
       d3.json("demo/demo.response.json", function(error, root) {
         buildIcicles(root);
+        buildLegend(root);
       });
     }
 
     debug.timeEnd("Start Up");
   });
 
-})(jQuery, _, Modernizr, less, debug, (window.Request || { JSON: function(){ return; } }));
+})(jQuery, _, Modernizr, less, debug, d3);

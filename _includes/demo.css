@@ -5,4 +5,20 @@ h1 {
 
 rect { stroke: #fff; }
 
-h3 { margin-top: 0; }
+#legend {
+  li {
+    padding-bottom: 0.25em;
+  }
+}
+.swatch {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+}
+
+.swatch-label { padding-left: 1em; }
+
+.depth-0 { padding-left: 0; }
+.depth-1 { padding-left: 1em; }
+.depth-2 { padding-left: 2em; }
+.depth-3 { padding-left: 3em; }
