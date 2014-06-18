@@ -58,10 +58,10 @@ var EIS = window.EIS || {};
 
     if(isJsFiddle) {
       $.ajax({
-        url: "/gh/get/response.json/sskeller/jsfiddles-eis-icicle/tree/master/demo",
-        type: "POST",
+        url: "/gh/get/response.json/sskeller/jsfiddles-eis-icicle/tree/master/demo/",
+        type: "post",
         dataType: "json",
-        data: { delay: 1 },
+        data: { 'delay': 1 },
         success: function(response) {
           buildIcicles(response);
         }
