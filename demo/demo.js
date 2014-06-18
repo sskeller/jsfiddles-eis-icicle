@@ -28,7 +28,7 @@ var EIS = window.EIS || {};
 
     var rect = svg.selectAll("rect");
     var isJsFiddle = /^fiddle[.]jshell[.]net$/.test(location.host);
-    var jsonURL = isJsFiddle ? "http://sskeller.github.io/jsfiddles-eis-icicle/json/icicle.json" : "json/icicle.json";
+    var jsonURL = isJsFiddle ? "/gh/get/response.json/sskeller/jsfiddles-eis-icicle/tree/master/demo" : "demo/demo.response.json";
 
     d3.json(jsonURL, function(error, root) {
       rect = rect.data(partition(root))
