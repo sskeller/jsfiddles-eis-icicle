@@ -1,6 +1,6 @@
-namespace :ghpages do
+namespace :publishto do
   desc "merges master to gh-pages, copies files to jekyll and pushes to github"
-  task :publish do
+  task :github do
 
     git_status = `git status --short`
     if(git_status != '')
@@ -20,7 +20,7 @@ namespace :ghpages do
       system "git merge master --no-edit"
 
       # run rake jsfiddle:copy
-      Rake::Task['copy:tojsfiddle'].execute
+      Rake::Task['copyto:jsfiddle'].execute
 
       # commit if files are changed
       git_status = `git status --short`
