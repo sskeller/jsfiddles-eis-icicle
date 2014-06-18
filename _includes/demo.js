@@ -65,7 +65,7 @@ var EIS = window.EIS || {};
         success: function(response) {
           buildIcicles(response);
         }
-      }).send();
+      });
     } else {
       d3.json("demo/demo.response.json", function(error, root) {
         buildIcicles(root);
