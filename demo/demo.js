@@ -40,18 +40,6 @@ var EIS = window.EIS || {};
 
     var rect = svg.selectAll("rect");
 
-    var icicleClicked = function(d) {
-      x.domain([d.x, d.x + d.dx]);
-      y.domain([d.y, 1]).range([d.y ? 20 : 0, height]);
-
-      rect.transition()
-        .duration(750)
-        .attr("x", function(d) { return x(d.x); })
-        .attr("y", function(d) { return y(d.y); })
-        .attr("width", function(d) { return x(d.x + d.dx) - x(d.x); })
-        .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); });
-    };
-
     var buildIcicles = function(root) {
       data = partition(root).sort(function(a, b) { return b.dollars - a.dollars; });
       rect = rect.data(data)
@@ -76,7 +64,7 @@ var EIS = window.EIS || {};
 
           return d.color;
         })
-        .on("click", icicleClicked);
+        .on("click", elementClicked);
     };
 
     var legend = d3.select("#legend");
@@ -87,12 +75,48 @@ var EIS = window.EIS || {};
         .enter().append("li");
       legendItem
         .attr("class", function(d) { return "depth-" + d.depth; })
+        .on("click", elementClicked)
         .append("span")
         .attr("class", "swatch")
         .style("background-color", function(d) { return d.color; });
       legendItem.append("span")
         .attr("class", "swatch-label")
         .text(function(d) { return d.name; });
+    };
+
+    var elementClicked = function(d) {
+      updateIcicle(d);
+      updateLegend(d);
+    };
+
+    var updateIcicle = function(d) {
+      x.domain([d.x, d.x + d.dx]);
+      y.domain([d.y, 1]).range([d.y ? 20 : 0, height]);
+
+      rect.transition()
+        .duration(750)
+        .attr("x", function(d) { return x(d.x); })
+        .attr("y", function(d) { return y(d.y); })
+        .attr("width", function(d) { return x(d.x + d.dx) - x(d.x); })
+        .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); });
+    };
+
+    var updateLegend = function(d) {
+        legendItem.transition()
+          .duration(750)
+          .style("display", function(d1) {
+            var shouldDisplay = d === d1;
+            shouldDisplay = shouldDisplay || d.parent && d.parent === d1;
+            shouldDisplay = shouldDisplay || d1.parent && d1.parent === d;
+            shouldDisplay = shouldDisplay || d1.parent && d1.parent.parent && d1.parent.parent === d;
+            shouldDisplay = shouldDisplay || d1.parent && d1.parent.parent && d1.parent.parent.parent && d1.parent.parent.parent === d;
+
+            if(shouldDisplay) {
+              return "block";
+            } else {
+              return "none";
+            }
+          });
     };
 
     if(isJsFiddle) {
