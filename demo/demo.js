@@ -1,11 +1,20 @@
 debug.time("Start Up");
 var EIS = window.EIS || {};
 
-(function ($, _, Modernizr, less, debug) {
+(function ($, _, Modernizr, less, debug, Request) {
   "use strict";
 
   _.extend(EIS, {
   });
+
+  var width = 945;
+  var height = 300;
+  var x = d3.scale.linear().range([0, width]);
+  var y = d3.scale.linear().range([0, height]);
+  var color = d3.scale.category20c();
+  var partition = d3.layout.partition()
+    .value(function(d) { return d.dollars; });
+  var isJsFiddle = /^fiddle[.]jshell[.]net$/.test(location.host);
 
   $(function() {
 
@@ -14,35 +23,12 @@ var EIS = window.EIS || {};
     less.refreshStyles();
     /*---------- End Shim ----------*/
 
-    var width = 945;
-    var height = 300;
-    var x = d3.scale.linear().range([0, width]);
-    var y = d3.scale.linear().range([0, height]);
-    var color = d3.scale.category20c();
-    var partition = d3.layout.partition()
-      .value(function(d) { return d.dollars; });
 
     var svg = d3.select("#icicle").append("svg")
       .attr("width", width)
       .attr("height", height);
 
     var rect = svg.selectAll("rect");
-    var isJsFiddle = /^fiddle[.]jshell[.]net$/.test(location.host);
-    var jsonURL = isJsFiddle ? "/gh/get/response.json/sskeller/jsfiddles-eis-icicle/tree/master/demo" : "demo/demo.response.json";
-
-    d3.json(jsonURL, function(error, root) {
-      rect = rect.data(partition(root))
-        .enter().append("rect")
-        .attr("x", function(d) { return x(d.x); })
-        .attr("y", function(d) { return y(d.y); })
-        .attr("width", function(d) { return x(d.dx); })
-        .attr("height", function(d) { return y(d.dy); })
-        .attr("fill", function(d, i) {
-          d.color = color(d.x + d.depth);
-          return d.color;
-        })
-        .on("click", icicleClicked);
-    });
 
     var icicleClicked = function(d) {
       x.domain([d.x, d.x + d.dx]);
@@ -56,7 +42,35 @@ var EIS = window.EIS || {};
         .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); });
     };
 
+    var buildIcicles = function(root) {
+      rect = rect.data(partition(root))
+        .enter().append("rect")
+        .attr("x", function(d) { return x(d.x); })
+        .attr("y", function(d) { return y(d.y); })
+        .attr("width", function(d) { return x(d.dx); })
+        .attr("height", function(d) { return y(d.dy); })
+        .attr("fill", function(d, i) {
+          d.color = color(d.x + d.depth);
+          return d.color;
+        })
+        .on("click", icicleClicked);
+    };
+
+    if(isJsFiddle) {
+      new Request.JSON({
+        url: "/gh/get/response.json/sskeller/jsfiddles-eis-icicle/tree/master/demo",
+        method: "post",
+        onSuccess: function(response) {
+          buildIcicles(response);
+        }
+      }).send();
+    } else {
+      d3.json("demo/demo.response.json", function(error, root) {
+        buildIcicles(root);
+      });
+    }
+
     debug.timeEnd("Start Up");
   });
 
-})(jQuery, _, Modernizr, less, debug);
+})(jQuery, _, Modernizr, less, debug, (window.Request || { JSON: function(){ return; } }));
