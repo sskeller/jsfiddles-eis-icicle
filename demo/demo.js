@@ -14,7 +14,7 @@ var EIS = window.EIS || {};
   var color = d3.scale.category20c();
   var partition = d3.layout.partition()
     .value(function(d) { return d.dollars; });
-  var isJsFiddle = /^fiddle[.]jshell[.]net$/.test(location.host);
+  var isJsFiddle = /^fiddle[.]jshell[.]net$/.test(location.host) || location.host === "jsfiddle.net";
 
   $(function() {
 
@@ -57,10 +57,12 @@ var EIS = window.EIS || {};
     };
 
     if(isJsFiddle) {
-      new Request.JSON({
+      $.ajax({
         url: "/gh/get/response.json/sskeller/jsfiddles-eis-icicle/tree/master/demo",
-        method: "post",
-        onSuccess: function(response) {
+        type: "POST",
+        dataType: "json",
+        data: { delay: 1 },
+        success: function(response) {
           buildIcicles(response);
         }
       }).send();
