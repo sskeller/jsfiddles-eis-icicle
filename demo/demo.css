@@ -1,10 +1,8 @@
 /* Less */
 h1 {
-  small {
-    display: block;
-  }
+  small { display: block; }
 }
 
-rect {
-  stroke: #fff;
-}
+rect { stroke: #fff; }
+
+h3 { margin-top: 0; }
