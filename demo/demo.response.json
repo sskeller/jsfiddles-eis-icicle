@@ -4,22 +4,22 @@
     {
       "name": "Sample Source 1",
       "children": [
-        { "name": "Demo Fund 1", "dollars": 10.00 },
-        { "name": "Demo Fund 2", "dollars": 15.00 },
-        { "name": "Demo Fund 3", "dollars": 5.00 }
+        { "name": "Demo Fund 1", "value": 10.00, "price": 0.25, "shares": 40 },
+        { "name": "Demo Fund 2", "value": 15.00, "price": 0.75, "shares": 20 },
+        { "name": "Demo Fund 3", "value": 5.00, "price": 0.50, "shares": 10 }
       ]
     },
     {
       "name": "Sample Source 2",
       "children": [
-        { "name": "Demo Fund 1", "dollars": 25.00 },
-        { "name": "Demo Fund 2", "dollars": 15.00 },
-        { "name": "Demo Fund 3", "dollars": 50.00 },
+        { "name": "Demo Fund 1", "value": 25.00, "price": 0.25, "shares": 100 },
+        { "name": "Demo Fund 2", "value": 15.00, "price": 0.75, "shares": 20 },
+        { "name": "Demo Fund 3", "value": 50.00, "price": 0.50, "shares": 100 },
         {
           "name": "Demo IPM 2",
           "children": [
-            { "name": "Demo Fund 1", "dollars": 10.00 },
-            { "name": "Demo Fund 3", "dollars": 50.00 }
+            { "name": "Demo Fund 1", "value": 10.00, "price": 0.25, "shares": 40 },
+            { "name": "Demo Fund 3", "value": 50.00, "price": 0.50, "shares": 100 }
           ]
         }
       ]
@@ -30,8 +30,8 @@
         {
           "name": "Demo IPM 1",
           "children": [
-            { "name": "Demo Fund 1", "dollars": 100.00 },
-            { "name": "Demo Fund 2", "dollars": 50.00 }
+            { "name": "Demo Fund 1", "value": 100.00, "price": 0.25, "shares": 400 },
+            { "name": "Demo Fund 2", "value": 45.00, "price": 0.75, "shares": 60 }
           ]
         }
       ]
