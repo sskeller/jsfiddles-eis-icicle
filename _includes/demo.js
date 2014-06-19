@@ -25,6 +25,14 @@ var EIS = window.EIS || {};
     .value(function(d) { return d.dollars; });
   var isJsFiddle = /^fiddle[.]jshell[.]net$/.test(location.host) || location.host === "jsfiddle.net";
 
+  function icicleSort(a,b) {
+    var compare = a.x - b.x;
+    if(compare === 0) {
+      compare = a.y - b.y;
+    }
+    return compare;
+  }
+
   $(function() {
 
     /*---------- Shim to treat CSS panel as Less ----------*/
@@ -41,7 +49,8 @@ var EIS = window.EIS || {};
     var rect = svg.selectAll("rect");
 
     var buildIcicles = function(root) {
-      data = partition(root).sort(function(a, b) { return b.dollars - a.dollars; });
+      data = partition(root).sort(icicleSort);
+      
       rect = rect.data(data)
         .enter().append("rect")
         .attr("x", function(d) { return x(d.x); })
