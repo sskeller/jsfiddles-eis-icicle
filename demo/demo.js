@@ -50,7 +50,7 @@ var EIS = window.EIS || {};
         .attr("height", function(d) { return y(d.dy); })
         .attr("fill", function(d, i) {
           if(d.depth === 0) {
-            d.color = "#bdbdbd";
+            d.color = "#969696";
           } else if(d.children) {
             d.colorIndex = EIS.nextColor;
             d.color = EIS.colors[d.colorIndex][0];
@@ -63,6 +63,16 @@ var EIS = window.EIS || {};
           }
 
           return d.color;
+        })
+        .each(function(d) {
+          if(d.x === 0 && d.y === 0) {
+            d3.select("#icicle svg")
+              .append("text")
+              .attr("x", x(0.5))
+              .attr("y", y(0.125) + 10)
+              .attr("class", "icicle-text")
+              .text(d.name);
+          }
         })
         .on("click", elementClicked);
     };
@@ -98,13 +108,26 @@ var EIS = window.EIS || {};
         .attr("x", function(d) { return x(d.x); })
         .attr("y", function(d) { return y(d.y); })
         .attr("width", function(d) { return x(d.x + d.dx) - x(d.x); })
-        .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); });
+        .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); })
+        .each(function(d1) {
+          if(d1 === d) {
+            var text = d3.select("#icicle .icicle-text");
+              text.transition().delay(750).text(d1.name);
+            if(d1.depth === 0) {
+              text.transition()
+                .duration(750)
+                .attr("y", y(0.125) + 10);
+            } else {
+              text.transition()
+                .duration(750)
+                .attr("y", y(d1.y + 0.125) + 10);
+            }
+          }
+        });
     };
 
     var updateLegend = function(d) {
-        legendItem.transition()
-          .duration(750)
-          .style("display", function(d1) {
+        legendItem.style("display", function(d1) {
             var shouldDisplay = d === d1;
             shouldDisplay = shouldDisplay || d.parent && d.parent === d1;
             shouldDisplay = shouldDisplay || d1.parent && d1.parent === d;
