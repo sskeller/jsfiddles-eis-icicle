@@ -50,7 +50,7 @@ var EIS = window.EIS || {};
 
     var buildIcicles = function(root) {
       data = partition(root).sort(icicleSort);
-      
+
       rect = rect.data(data)
         .enter().append("rect")
         .attr("x", function(d) { return x(d.x); })
@@ -121,7 +121,7 @@ var EIS = window.EIS || {};
         .each(function(d1) {
           if(d1 === d) {
             var text = d3.select("#icicle .icicle-text");
-              text.transition().delay(750).text(d1.name);
+              text.text(d1.name);
             if(d1.depth === 0) {
               text.transition()
                 .duration(750)
