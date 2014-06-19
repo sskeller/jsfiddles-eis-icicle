@@ -22,7 +22,7 @@ var EIS = window.EIS || {};
   var x = d3.scale.linear().range([0, width]);
   var y = d3.scale.linear().range([0, height]);
   var partition = d3.layout.partition()
-    .value(function(d) { return d.dollars; });
+    .value(function(d) { return d.value; });
   var isJsFiddle = /^fiddle[.]jshell[.]net$/.test(location.host) || location.host === "jsfiddle.net";
 
   function icicleSort(a,b) {
