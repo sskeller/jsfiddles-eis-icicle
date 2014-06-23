@@ -59,8 +59,8 @@ var EIS = window.EIS || {};
     var data = {};
 
     var svg = d3.select("#icicle").append("svg")
-      .attr("width", width)
-      .attr("height", height);
+      .attr("viewBox", "0 0 " + width + " " + height)
+      .attr("preserveAspectRatio", "xMinYMin");
 
     var rect = svg.selectAll("rect");
 
