@@ -24,6 +24,8 @@ var EIS = window.EIS || {};
   var partition = d3.layout.partition()
     .value(function(d) { return d.value; });
   var isJsFiddle = /^fiddle[.]jshell[.]net$/.test(location.host) || location.host === "jsfiddle.net";
+  var formatPercent = d3.format(".1%");
+  var formatDollar = d3.format("$,.2f");
 
   function icicleSort(a,b) {
     var compare = a.x - b.x;
@@ -129,16 +131,18 @@ var EIS = window.EIS || {};
           totalTable.select("caption .swatch").style("background", d.color);
           totalTable.select("caption .text").text(d.name);
           row = totalTable.select("tbody tr");
-          row.append("td").text("$" + d.value);
-          row.append("td").text("$" + d.vested);
+          row.append("td").text(formatDollar(d.value));
+          row.append("td").text(formatDollar(d.vested));
+          row.append("td").text(formatPercent(d.vested / d.value));
         } else if(d.depth === 1) {
           row = itemTable.select("tbody").append("tr");
           row.append("td").append("span")
             .attr("class", "swatch")
             .style("background", d.color);
           row.append("td").text(d.name);
-          row.append("td").text("$" + d.value);
-          row.append("td").text("$" + d.vested);
+          row.append("td").text(formatDollar(d.value));
+          row.append("td").text(formatDollar(d.vested));
+          row.append("td").text(formatPercent(d.vested / d.value));
           row.on("click", function() { elementClicked(d); });
         }
       });
@@ -203,8 +207,9 @@ var EIS = window.EIS || {};
       totalTable.select("caption .text").text(d.name);
       row = totalTable.select("tbody tr");
       row.html("");
-      row.append("td").text("$" + d.value);
-      row.append("td").text("$" + d.vested);
+      row.append("td").text(formatDollar(d.value));
+      row.append("td").text(formatDollar(d.vested));
+      row.append("td").text(formatPercent(d.vested / d.value));
 
       if(d.depth === 0) {
         header.text("Sources");
@@ -222,8 +227,9 @@ var EIS = window.EIS || {};
             .attr("class", "swatch")
             .style("background", d1.color);
           row.append("td").text(d1.name);
-          row.append("td").text("$" + d1.value);
-          row.append("td").text("$" + d1.vested);
+          row.append("td").text(formatDollar(d1.value));
+          row.append("td").text(formatDollar(d1.vested));
+          row.append("td").text(formatPercent(d1.vested / d1.value));
           row.on("click", function() { elementClicked(d1); });
         });
 
