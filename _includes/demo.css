@@ -3,11 +3,43 @@ h1 {
   small { display: block; }
 }
 
-rect { stroke: #fff; }
+rect {
+  stroke: #fff;
+
+  &.clickable {
+    cursor: pointer;
+  }
+}
 
 #legend {
   li {
     padding-bottom: 0.25em;
+    cursor: pointer;
+  }
+}
+
+#total-table,
+#item-table {
+  width: auto;
+  margin-top: 1em;
+
+  caption {
+    text-align: left;
+
+    .swatch {
+      margin-right: 0.5em;
+    }
+  }
+
+  td,
+  th { padding-right: 2em; }
+}
+
+#item-table {
+  td:first-child,
+  th:first-child { padding-right: 0.5em; }
+
+  tbody tr {
     cursor: pointer;
   }
 }
