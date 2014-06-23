@@ -19,18 +19,6 @@ namespace :publishto do
       # merge trunk
       system "git merge master --no-edit"
 
-      # run rake jsfiddle:copy
-      Rake::Task['copyto:jsfiddle'].execute
-
-      # commit if files are changed
-      git_status = `git status --short`
-      if(git_status != '')
-        system "git add ."
-        system 'git commit -m "Update Jekyll files from jsFiddle files [automated]"'
-      else
-        puts "No changes, skipping commit."
-      end
-
       # push
       system "git push origin"
 
