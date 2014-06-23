@@ -33,6 +33,20 @@ var EIS = window.EIS || {};
     return compare;
   }
 
+  function rollUpData(data) {
+    data.reverse();
+    _.each(data, function(node) {
+      if(node.children) {
+        var sum = 0;
+        _.each(node.children, function(child) {
+          sum += child.vested;
+        });
+        node.vested = sum;
+      }
+    });
+    data.reverse();
+  }
+
   $(function() {
 
     /*---------- Shim to treat CSS panel as Less ----------*/
@@ -50,9 +64,11 @@ var EIS = window.EIS || {};
 
     var buildIcicles = function(root) {
       data = partition(root).sort(icicleSort);
+      rollUpData(data);
 
       rect = rect.data(data)
         .enter().append("rect")
+        .attr("class", "clickable")
         .attr("x", function(d) { return x(d.x); })
         .attr("y", function(d) { return y(d.y); })
         .attr("width", function(d) { return x(d.dx); })
@@ -89,7 +105,7 @@ var EIS = window.EIS || {};
     var legend = d3.select("#legend");
     var legendItem = legend.selectAll("li");
 
-    var buildLegend = function(root) {
+    var buildLegend = function() {
       legendItem = legendItem.data(data)
         .enter().append("li");
       legendItem
@@ -103,9 +119,35 @@ var EIS = window.EIS || {};
         .text(function(d) { return d.name; });
     };
 
+    var buildTable = function() {
+      var totalTable = d3.select("#total-table");
+      var itemTable = d3.select("#item-table");
+      var row;
+
+      _.each(data, function(d) {
+        if(d.depth === 0) {
+          totalTable.select("caption .swatch").style("background", d.color);
+          totalTable.select("caption .text").text(d.name);
+          row = totalTable.select("tbody tr");
+          row.append("td").text("$" + d.value);
+          row.append("td").text("$" + d.vested);
+        } else if(d.depth === 1) {
+          row = itemTable.select("tbody").append("tr");
+          row.append("td").append("span")
+            .attr("class", "swatch")
+            .style("background", d.color);
+          row.append("td").text(d.name);
+          row.append("td").text("$" + d.value);
+          row.append("td").text("$" + d.vested);
+          row.on("click", function() { elementClicked(d1); });
+        }
+      });
+    };
+
     var elementClicked = function(d) {
       updateIcicle(d);
       updateLegend(d);
+      updateTable(d);
     };
 
     var updateIcicle = function(d) {
@@ -151,6 +193,46 @@ var EIS = window.EIS || {};
           });
     };
 
+    var updateTable = function(d) {
+      var totalTable = d3.select("#total-table");
+      var itemTable = d3.select("#item-table");
+      var header = itemTable.select(".col-title");
+      var row;
+
+      totalTable.select("caption .swatch").style("background", d.color);
+      totalTable.select("caption .text").text(d.name);
+      row = totalTable.select("tbody tr");
+      row.html("");
+      row.append("td").text("$" + d.value);
+      row.append("td").text("$" + d.vested);
+
+      if(d.depth === 0) {
+        header.text("Sources");
+      } else if(d.depth === 1) {
+        header.text("Funds / IPMs");
+      } else {
+        header.text("Funds");
+      }
+
+      if(d.children) {
+        itemTable.select("tbody").html("");
+        _.each(d.children, function(d1) {
+          row = itemTable.select("tbody").append("tr");
+          row.append("td").append("span")
+            .attr("class", "swatch")
+            .style("background", d1.color);
+          row.append("td").text(d1.name);
+          row.append("td").text("$" + d1.value);
+          row.append("td").text("$" + d1.vested);
+          row.on("click", function() { elementClicked(d1); });
+        });
+
+        itemTable.attr("class", "table table-striped");
+      } else {
+        itemTable.attr("class", "hide");
+      }
+    };
+
     if(isJsFiddle) {
       $.ajax({
         url: "/gh/get/response.json/sskeller/jsfiddles-eis-icicle/tree/master/demo/",
@@ -159,13 +241,15 @@ var EIS = window.EIS || {};
         data: { 'delay': 1 },
         success: function(response) {
           buildIcicles(response);
-          buildLegend(response);
+          buildLegend();
+          buildTable();
         }
       });
     } else {
       d3.json("demo/demo.response.json", function(error, root) {
         buildIcicles(root);
-        buildLegend(root);
+        buildLegend();
+        buildTable();
       });
     }
 
