@@ -15,6 +15,7 @@ h1 {
 
 rect {
   stroke: #fff;
+  stroke-width: 2;
 
   &.clickable {
     cursor: pointer;
