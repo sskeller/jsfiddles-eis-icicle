@@ -139,7 +139,7 @@ var EIS = window.EIS || {};
           row.append("td").text(d.name);
           row.append("td").text("$" + d.value);
           row.append("td").text("$" + d.vested);
-          row.on("click", function() { elementClicked(d1); });
+          row.on("click", function() { elementClicked(d); });
         }
       });
     };
