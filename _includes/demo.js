@@ -125,26 +125,24 @@ var EIS = window.EIS || {};
       var totalTable = d3.select("#total-table");
       var itemTable = d3.select("#item-table");
       var row;
+      var root = data[0];
+      totalTable.select("caption .swatch").style("background", root.color);
+      totalTable.select("caption .text").text(root.name);
+      row = totalTable.select("tbody tr");
+      row.append("td").text(formatDollar(root.value));
+      row.append("td").text(formatDollar(root.vested));
+      row.append("td").text(formatPercent(root.vested / root.value));
 
-      _.each(data, function(d) {
-        if(d.depth === 0) {
-          totalTable.select("caption .swatch").style("background", d.color);
-          totalTable.select("caption .text").text(d.name);
-          row = totalTable.select("tbody tr");
-          row.append("td").text(formatDollar(d.value));
-          row.append("td").text(formatDollar(d.vested));
-          row.append("td").text(formatPercent(d.vested / d.value));
-        } else if(d.depth === 1) {
-          row = itemTable.select("tbody").append("tr");
-          row.append("td").append("span")
-            .attr("class", "swatch")
-            .style("background", d.color);
-          row.append("td").text(d.name);
-          row.append("td").text(formatDollar(d.value));
-          row.append("td").text(formatDollar(d.vested));
-          row.append("td").text(formatPercent(d.vested / d.value));
-          row.on("click", function() { elementClicked(d); });
-        }
+      _.each(root.children, function(d) {
+        row = itemTable.select("tbody").append("tr");
+        row.append("td").append("span")
+          .attr("class", "swatch")
+          .style("background", d.color);
+        row.append("td").text(d.name);
+        row.append("td").text(formatDollar(d.value));
+        row.append("td").text(formatDollar(d.vested));
+        row.append("td").text(formatPercent(d.vested / d.value));
+        row.on("click", function() { elementClicked(d); });
       });
     };
 
