@@ -17,7 +17,7 @@ var EIS = window.EIS || {};
     nextColors: [ 1, 1, 1, 1, 1, 1 ]
   });
 
-  var width = 945;
+  var width = 1000;
   var height = 300;
   var x = d3.scale.linear().range([0, width]);
   var y = d3.scale.linear().range([0, height]);
