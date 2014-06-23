@@ -15,6 +15,7 @@ h1 {
 
 rect {
   stroke: #fff;
+  stroke-width: 2;
 
   &.clickable {
     cursor: pointer;
@@ -35,6 +36,7 @@ rect {
 
   caption {
     text-align: left;
+    cursor: pointer;
 
     .swatch {
       margin-right: 0.5em;
