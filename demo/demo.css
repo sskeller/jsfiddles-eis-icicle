@@ -35,6 +35,7 @@ rect {
 
   caption {
     text-align: left;
+    cursor: pointer;
 
     .swatch {
       margin-right: 0.5em;

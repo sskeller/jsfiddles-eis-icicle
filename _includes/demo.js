@@ -201,8 +201,12 @@ var EIS = window.EIS || {};
       var header = itemTable.select(".col-title");
       var row;
 
-      totalTable.select("caption .swatch").style("background", d.color);
-      totalTable.select("caption .text").text(d.name);
+      var caption = totalTable.select("caption");
+      caption.on("click", function() {
+        elementClicked(d.parent ? d.parent : d);
+      });
+      caption.select(".swatch").style("background", d.color);
+      caption.select(".text").text(d.name);
       row = totalTable.select("tbody tr");
       row.html("");
       row.append("td").text(formatDollar(d.value));
