@@ -118,17 +118,17 @@ var EIS = window.EIS || {};
           .attr("x", 0)
           .attr("y", y(0.375) + 10)
           .classed({"icicle-labels": true, "depth-1": true})
-          .text("Source");
+          .text("Source(s)");
         svg.append("text")
           .attr("x", 0)
           .attr("y", y(0.625) + 10)
           .classed({"icicle-labels": true, "depth-2": true})
-          .text("Fund");
+          .text("Fund(s)");
         svg.append("text")
           .attr("x", 0)
           .attr("y", y(0.875) + 10)
           .classed({"icicle-labels": true, "depth-3": true})
-          .text("Fund");
+          .text("Fund(s)");
 
     };
 
