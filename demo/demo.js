@@ -92,17 +92,18 @@ var EIS = window.EIS || {};
 
           return d.color;
         })
-        .each(function(d) {
-          if(d.x === 0 && d.y === 0) {
-            d3.select("#icicle svg")
-              .append("text")
-              .attr("x", x(0.5))
-              .attr("y", y(0.125) + 10)
-              .attr("class", "icicle-text")
-              .text(d.name);
-          }
-        })
         .on("click", elementClicked);
+
+        var d = data[0];
+        if(d.x === 0 && d.y === 0) {
+          d3.select("#icicle svg")
+            .append("text")
+            .attr("x", x(0.5))
+            .attr("y", y(0.125) + 10)
+            .attr("class", "icicle-text")
+            .text(d.name);
+        }
+
         svg.append("rect").attr("class", "labels")
           .attr("x", 0)
           .attr("y", 0)
@@ -188,22 +189,19 @@ var EIS = window.EIS || {};
         .attr("x", function(d) { return x(d.x); })
         .attr("y", function(d) { return y(d.y); })
         .attr("width", function(d) { return x(d.x + d.dx) - x(d.x); })
-        .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); })
-        .each(function(d1) {
-          if(d1 === d) {
-            var text = d3.select("#icicle .icicle-text");
-              text.text(d1.name);
-            if(d1.depth === 0) {
-              text.transition()
-                .duration(750)
-                .attr("y", y(0.125) + 10);
-            } else {
-              text.transition()
-                .duration(750)
-                .attr("y", y(d1.y + 0.125) + 10);
-            }
-          }
-        });
+        .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); });
+
+        var text = d3.select("#icicle .icicle-text");
+          text.text(d.name);
+        if(d.depth === 0) {
+          text.transition()
+            .duration(750)
+            .attr("y", y(0.125) + 10);
+        } else {
+          text.transition()
+            .duration(750)
+            .attr("y", y(d.y + 0.125) + 10);
+        }
     };
 
     var updateLegend = function(d) {
