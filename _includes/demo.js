@@ -71,7 +71,7 @@ var EIS = window.EIS || {};
 
       rect = rect.data(data)
         .enter().append("rect")
-        .attr("class", "clickable")
+        .classed({"clickable": true})
         .attr("x", function(d) { return x(d.x); })
         .attr("y", function(d) { return y(d.y); })
         .attr("width", function(d) { return dx(d.dx); })
@@ -100,11 +100,11 @@ var EIS = window.EIS || {};
             .append("text")
             .attr("x", x(0.5))
             .attr("y", y(0.125) + 10)
-            .attr("class", "icicle-text")
+            .classed({"icicle-text": true})
             .text(d.name);
         }
 
-        svg.append("rect").attr("class", "labels")
+        svg.append("rect").classed({"labels": true})
           .attr("x", 0)
           .attr("y", 0)
           .attr("width", 100)
@@ -112,22 +112,22 @@ var EIS = window.EIS || {};
         svg.append("text")
           .attr("x", 0)
           .attr("y", y(0.125) + 10)
-          .attr("class", "icicle-labels depth-0")
+          .classed({"icicle-labels": true, "depth-0": true})
           .text("Plan");
         svg.append("text")
           .attr("x", 0)
           .attr("y", y(0.375) + 10)
-          .attr("class", "icicle-labels depth-1")
+          .classed({"icicle-labels": true, "depth-1": true})
           .text("Source");
         svg.append("text")
           .attr("x", 0)
           .attr("y", y(0.625) + 10)
-          .attr("class", "icicle-labels depth-2")
+          .classed({"icicle-labels": true, "depth-2": true})
           .text("Fund");
         svg.append("text")
           .attr("x", 0)
           .attr("y", y(0.875) + 10)
-          .attr("class", "icicle-labels depth-3")
+          .classed({"icicle-labels": true, "depth-3": true})
           .text("Fund");
 
     };
@@ -142,10 +142,10 @@ var EIS = window.EIS || {};
         .attr("class", function(d) { return "depth-" + d.depth; })
         .on("click", elementClicked)
         .append("span")
-        .attr("class", "swatch")
+        .classed({"swatch": true})
         .style("background-color", function(d) { return d.color; });
       legendItem.append("span")
-        .attr("class", "swatch-label")
+        .classed({"swatch-label": true})
         .text(function(d) { return d.name; });
     };
 
@@ -164,7 +164,7 @@ var EIS = window.EIS || {};
       _.each(root.children, function(d) {
         row = itemTable.select("tbody").append("tr");
         row.append("td").append("span")
-          .attr("class", "swatch")
+          .classed({"swatch": true})
           .style("background", d.color);
         row.append("td").text(d.name);
         row.append("td").text(formatDollar(d.value));
@@ -223,6 +223,7 @@ var EIS = window.EIS || {};
     var updateTable = function(d) {
       var totalTable = d3.select("#total-table");
       var itemTable = d3.select("#item-table");
+      itemTable.classed({"table": true, "table-striped": true});
       var header = itemTable.select(".col-title");
       var row;
 
@@ -251,7 +252,7 @@ var EIS = window.EIS || {};
         _.each(d.children, function(d1) {
           row = itemTable.select("tbody").append("tr");
           row.append("td").append("span")
-            .attr("class", "swatch")
+            .classed({"swatch": true})
             .style("background", d1.color);
           row.append("td").text(d1.name);
           row.append("td").text(formatDollar(d1.value));
@@ -260,9 +261,9 @@ var EIS = window.EIS || {};
           row.on("click", function() { elementClicked(d1); });
         });
 
-        itemTable.attr("class", "table table-striped");
+        itemTable.classed({"hide": false});
       } else {
-        itemTable.attr("class", "hide");
+        itemTable.classed({"hide": true});
       }
     };
 
