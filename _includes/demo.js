@@ -19,7 +19,8 @@ var EIS = window.EIS || {};
 
   var width = 1000;
   var height = 300;
-  var x = d3.scale.linear().range([0, width]);
+  var x = d3.scale.linear().range([100, width]);
+  var dx = d3.scale.linear().range([0, width-100]);
   var y = d3.scale.linear().range([0, height]);
   var partition = d3.layout.partition()
     .value(function(d) { return d.value; });
@@ -73,7 +74,7 @@ var EIS = window.EIS || {};
         .attr("class", "clickable")
         .attr("x", function(d) { return x(d.x); })
         .attr("y", function(d) { return y(d.y); })
-        .attr("width", function(d) { return x(d.dx); })
+        .attr("width", function(d) { return dx(d.dx); })
         .attr("height", function(d) { return y(d.dy); })
         .attr("fill", function(d, i) {
           if(d.depth === 0) {
@@ -102,6 +103,32 @@ var EIS = window.EIS || {};
           }
         })
         .on("click", elementClicked);
+        svg.append("rect").attr("class", "labels")
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("width", 100)
+          .attr("height", height);
+        svg.append("text")
+          .attr("x", 0)
+          .attr("y", y(0.125) + 10)
+          .attr("class", "icicle-labels depth-0")
+          .text("Plan");
+        svg.append("text")
+          .attr("x", 0)
+          .attr("y", y(0.375) + 10)
+          .attr("class", "icicle-labels depth-1")
+          .text("Source");
+        svg.append("text")
+          .attr("x", 0)
+          .attr("y", y(0.625) + 10)
+          .attr("class", "icicle-labels depth-2")
+          .text("Fund");
+        svg.append("text")
+          .attr("x", 0)
+          .attr("y", y(0.875) + 10)
+          .attr("class", "icicle-labels depth-3")
+          .text("Fund");
+
     };
 
     var legend = d3.select("#legend");
