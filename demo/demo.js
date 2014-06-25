@@ -19,7 +19,8 @@ var EIS = window.EIS || {};
 
   var width = 1000;
   var height = 300;
-  var x = d3.scale.linear().range([0, width]);
+  var x = d3.scale.linear().range([100, width]);
+  var dx = d3.scale.linear().range([0, width-100]);
   var y = d3.scale.linear().range([0, height]);
   var partition = d3.layout.partition()
     .value(function(d) { return d.value; });
@@ -70,10 +71,10 @@ var EIS = window.EIS || {};
 
       rect = rect.data(data)
         .enter().append("rect")
-        .attr("class", "clickable")
+        .classed({"clickable": true})
         .attr("x", function(d) { return x(d.x); })
         .attr("y", function(d) { return y(d.y); })
-        .attr("width", function(d) { return x(d.dx); })
+        .attr("width", function(d) { return dx(d.dx); })
         .attr("height", function(d) { return y(d.dy); })
         .attr("fill", function(d, i) {
           if(d.depth === 0) {
@@ -91,17 +92,44 @@ var EIS = window.EIS || {};
 
           return d.color;
         })
-        .each(function(d) {
-          if(d.x === 0 && d.y === 0) {
-            d3.select("#icicle svg")
-              .append("text")
-              .attr("x", x(0.5))
-              .attr("y", y(0.125) + 10)
-              .attr("class", "icicle-text")
-              .text(d.name);
-          }
-        })
         .on("click", elementClicked);
+
+        var d = data[0];
+        if(d.x === 0 && d.y === 0) {
+          d3.select("#icicle svg")
+            .append("text")
+            .attr("x", x(0.5))
+            .attr("y", y(0.125) + 10)
+            .classed({"icicle-text": true})
+            .text(d.name);
+        }
+
+        svg.append("rect").classed({"labels": true})
+          .attr("x", 0)
+          .attr("y", 0)
+          .attr("width", 100)
+          .attr("height", height);
+        svg.append("text")
+          .attr("x", 0)
+          .attr("y", y(0.125) + 10)
+          .classed({"icicle-labels": true, "depth-0": true})
+          .text("Plan");
+        svg.append("text")
+          .attr("x", 0)
+          .attr("y", y(0.375) + 10)
+          .classed({"icicle-labels": true, "depth-1": true})
+          .text("Source");
+        svg.append("text")
+          .attr("x", 0)
+          .attr("y", y(0.625) + 10)
+          .classed({"icicle-labels": true, "depth-2": true})
+          .text("Fund");
+        svg.append("text")
+          .attr("x", 0)
+          .attr("y", y(0.875) + 10)
+          .classed({"icicle-labels": true, "depth-3": true})
+          .text("Fund");
+
     };
 
     var legend = d3.select("#legend");
@@ -114,10 +142,10 @@ var EIS = window.EIS || {};
         .attr("class", function(d) { return "depth-" + d.depth; })
         .on("click", elementClicked)
         .append("span")
-        .attr("class", "swatch")
+        .classed({"swatch": true})
         .style("background-color", function(d) { return d.color; });
       legendItem.append("span")
-        .attr("class", "swatch-label")
+        .classed({"swatch-label": true})
         .text(function(d) { return d.name; });
     };
 
@@ -136,7 +164,7 @@ var EIS = window.EIS || {};
       _.each(root.children, function(d) {
         row = itemTable.select("tbody").append("tr");
         row.append("td").append("span")
-          .attr("class", "swatch")
+          .classed({"swatch": true})
           .style("background", d.color);
         row.append("td").text(d.name);
         row.append("td").text(formatDollar(d.value));
@@ -163,20 +191,34 @@ var EIS = window.EIS || {};
         .attr("width", function(d) { return x(d.x + d.dx) - x(d.x); })
         .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); })
         .each(function(d1) {
-          if(d1 === d) {
-            var text = d3.select("#icicle .icicle-text");
-              text.text(d1.name);
-            if(d1.depth === 0) {
-              text.transition()
-                .duration(750)
-                .attr("y", y(0.125) + 10);
-            } else {
-              text.transition()
-                .duration(750)
-                .attr("y", y(d1.y + 0.125) + 10);
-            }
+          var selected = d;
+          var current = d1;
+          var label = svg.select(".depth-" + current.depth);
+
+          if(current.depth < selected.depth -1) {
+            label.classed({"hide": true});
+          } else if(current.depth > selected.depth && !selected.children) {
+            label.classed({"hide": true});
+          } else {
+            label.classed({"hide": false});
           }
+
+          var divisor = current.depth === selected.depth - 1 ? 1 : 2;
+          label.transition().duration(750)
+            .attr("y", y(d1.y + (d1.dy / divisor)));
         });
+
+        var text = d3.select("#icicle .icicle-text");
+          text.text(d.name);
+        if(d.depth === 0) {
+          text.transition()
+            .duration(750)
+            .attr("y", y(0.125) + 10);
+        } else {
+          text.transition()
+            .duration(750)
+            .attr("y", y(d.y + 0.125) + 10);
+        }
     };
 
     var updateLegend = function(d) {
@@ -198,6 +240,7 @@ var EIS = window.EIS || {};
     var updateTable = function(d) {
       var totalTable = d3.select("#total-table");
       var itemTable = d3.select("#item-table");
+      itemTable.classed({"table": true, "table-striped": true});
       var header = itemTable.select(".col-title");
       var row;
 
@@ -226,7 +269,7 @@ var EIS = window.EIS || {};
         _.each(d.children, function(d1) {
           row = itemTable.select("tbody").append("tr");
           row.append("td").append("span")
-            .attr("class", "swatch")
+            .classed({"swatch": true})
             .style("background", d1.color);
           row.append("td").text(d1.name);
           row.append("td").text(formatDollar(d1.value));
@@ -235,9 +278,9 @@ var EIS = window.EIS || {};
           row.on("click", function() { elementClicked(d1); });
         });
 
-        itemTable.attr("class", "table table-striped");
+        itemTable.classed({"hide": false});
       } else {
-        itemTable.attr("class", "hide");
+        itemTable.classed({"hide": true});
       }
     };
 
