@@ -189,7 +189,24 @@ var EIS = window.EIS || {};
         .attr("x", function(d) { return x(d.x); })
         .attr("y", function(d) { return y(d.y); })
         .attr("width", function(d) { return x(d.x + d.dx) - x(d.x); })
-        .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); });
+        .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); })
+        .each(function(d1) {
+          var selected = d;
+          var current = d1;
+          var label = svg.select(".depth-" + current.depth);
+
+          if(current.depth < selected.depth -1) {
+            label.classed({"hide": true});
+          } else if(current.depth > selected.depth && !selected.children) {
+            label.classed({"hide": true});
+          } else {
+            label.classed({"hide": false});
+          }
+
+          var divisor = current.depth === selected.depth - 1 ? 1 : 2;
+          label.transition().duration(750)
+            .attr("y", y(d1.y + (d1.dy / divisor)));
+        });
 
         var text = d3.select("#icicle .icicle-text");
           text.text(d.name);
