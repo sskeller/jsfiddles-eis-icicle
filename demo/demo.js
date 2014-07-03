@@ -6,12 +6,12 @@ var EIS = window.EIS || {};
 
   _.extend(EIS, {
     colors: [
-      colorbrewer.Blues["6"].reverse(),
-      colorbrewer.Reds["6"].reverse(),
-      colorbrewer.Greens["6"].reverse(),
-      colorbrewer.Oranges["6"].reverse(),
-      colorbrewer.Purples["6"].reverse(),
-      colorbrewer.PuRd["6"].reverse()
+      colorbrewer.Blues["7"].reverse(),
+      colorbrewer.Reds["7"].reverse(),
+      colorbrewer.Greens["7"].reverse(),
+      colorbrewer.Oranges["7"].reverse(),
+      colorbrewer.Purples["7"].reverse(),
+      colorbrewer.PuRd["7"].reverse()
     ],
     nextColor: 0,
     nextColors: [ 1, 1, 1, 1, 1, 1 ]
@@ -24,9 +24,26 @@ var EIS = window.EIS || {};
   var y = d3.scale.linear().range([0, height]);
   var partition = d3.layout.partition()
     .value(function(d) { return d.value; });
-  var isJsFiddle = /^fiddle[.]jshell[.]net$/.test(location.host) || location.host === "jsfiddle.net";
   var formatPercent = d3.format(".1%");
   var formatDollar = d3.format("$,.2f");
+
+  function getData() {
+    var isJsFiddle = /^fiddle[.]jshell[.]net$/.test(location.host) || location.host === "jsfiddle.net";
+    var promise;
+
+    if(isJsFiddle) {
+      promise = $.ajax({
+        url: "/gh/get/response.json/sskeller/jsfiddles-eis-icicle/tree/master/demo/",
+        type: "post",
+        dataType: "json",
+        data: { 'delay': 1 }
+      });
+    } else {
+      promise = $.getJSON("demo/demo.response.json");
+    }
+
+    return promise;
+  }
 
   function icicleSort(a,b) {
     var compare = a.x - b.x;
@@ -79,13 +96,15 @@ var EIS = window.EIS || {};
         .attr("fill", function(d, i) {
           if(d.depth === 0) {
             d.color = "#969696";
-          } else if(d.children) {
+          } else if(d.depth === 1) {
             d.colorIndex = EIS.nextColor;
+            d.parentColorIndex = EIS.nextColor;
             d.color = EIS.colors[d.colorIndex][0];
             EIS.nextColor = (EIS.nextColor + 1) % EIS.colors.length;
           } else {
-            var parentIndex = d.parent.colorIndex;
+            var parentIndex = d.parent.parentColorIndex;
             d.colorIndex = EIS.nextColors[parentIndex];
+            d.parentColorIndex = parentIndex;
             d.color = EIS.colors[parentIndex][d.colorIndex];
             EIS.nextColors[parentIndex] = (EIS.nextColors[parentIndex] + 1) % EIS.colors[parentIndex].length;
           }
@@ -284,25 +303,11 @@ var EIS = window.EIS || {};
       }
     };
 
-    if(isJsFiddle) {
-      $.ajax({
-        url: "/gh/get/response.json/sskeller/jsfiddles-eis-icicle/tree/master/demo/",
-        type: "post",
-        dataType: "json",
-        data: { 'delay': 1 },
-        success: function(response) {
-          buildIcicles(response);
-          buildLegend();
-          buildTable();
-        }
-      });
-    } else {
-      d3.json("demo/demo.response.json", function(error, root) {
-        buildIcicles(root);
-        buildLegend();
-        buildTable();
-      });
-    }
+    getData().done(function(response) {
+      buildIcicles(response);
+      buildLegend();
+      buildTable();
+    });
 
     debug.timeEnd("Start Up");
   });
