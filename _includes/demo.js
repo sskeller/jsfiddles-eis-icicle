@@ -304,12 +304,37 @@ EIS.icicle = {
     var data = {};
 
     // Local Variables
+    var el;
+    var totalTable;
+    var itemTable;
     var nextColor = 0;
     var nextColors = [ 1, 1, 1, 1, 1, 1];
 
     // Main Function
     function my(table) {
+      el = table;
+      totalTable = table.select('#total-table');
+      itemTable = table.select('#item-table');
+      var row;
+      var root = data[0];
+      totalTable.select('caption .swatch').style('background', root.color);
+      totalTable.select('caption .text').text(root.name);
+      row = totalTable.select('tbody tr');
+      row.append('td').text(formatDollar(root.value));
+      row.append('td').text(formatDollar(root.vested));
+      row.append('td').text(formatPercent(root.vested / root.value));
 
+      _.each(root.children, function(d) {
+        row = itemTable.select('tbody').append('tr');
+        row.append('td').append('span')
+          .classed({'swatch': true})
+          .style('background', d.color);
+        row.append('td').text(d.name);
+        row.append('td').text(formatDollar(d.value));
+        row.append('td').text(formatDollar(d.vested));
+        row.append('td').text(formatPercent(d.vested / d.value));
+        row.on('click', function() { $(table).trigger('click', d); });
+      });
     }
 
     // Other Functions
@@ -371,7 +396,7 @@ EIS.AccountSummaryBuilder = function() {
   function my(data) {
     icicleEl = d3.select('#icicle');
     legendEl = d3.select('#icicle-legend');
-    tableEl = d3.select('#icicle-table');
+    tableEl = d3.select('#icicle-tables');
 
     icicle = EIS.icicle.Chart()
       .data(data)
