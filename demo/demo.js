@@ -19,7 +19,7 @@ EIS.icicle = {
 
   topColor: '#969696',
 
-  // Dumb Icicle Chart Builder
+  // Icicle Chart Builder
   Chart: function() {
     // Configurable Options
     var width = 1000;
@@ -43,7 +43,6 @@ EIS.icicle = {
     // Local Variables
     var el;
     var nextColor = 0;
-    var nextColors = [ 1, 1, 1, 1, 1, 1];
     var x = d3.scale.linear().range([padding, width]);
     var dx = d3.scale.linear().range([0, width-padding]);
     var y = d3.scale.linear().range([0, height]);
@@ -78,14 +77,15 @@ EIS.icicle = {
           } else if(d.depth === 1) {
             d.colorIndex = nextColor;
             d.parentColorIndex = nextColor;
+            d.parentNextColor = 1;
             d.color = colors[d.colorIndex][0];
             nextColor = (nextColor + 1) % colors.length;
           } else {
             var parentIndex = d.parent.parentColorIndex;
-            d.colorIndex = nextColors[parentIndex];
+            d.colorIndex = d.parent.parentNextColor;
             d.parentColorIndex = parentIndex;
             d.color = colors[parentIndex][d.colorIndex];
-            nextColors[parentIndex] = (nextColors[parentIndex] + 1) % colors[parentIndex].length;
+            d.parent.parentNextColor = (d.colorIndex + 1) % colors[parentIndex].length;
           }
 
           return d.color;
@@ -225,7 +225,7 @@ EIS.icicle = {
     return my;
   },
 
-  // Dumb Icicle Legend Builder
+  // Icicle Legend Builder
   Legend: function() {
     // Configurable Options
     var colors = EIS.icicle.colors;
@@ -235,8 +235,6 @@ EIS.icicle = {
     // Local Variables
     var el;
     var legendItem;
-    var nextColor = 0;
-    var nextColors = [ 1, 1, 1, 1, 1, 1];
 
     // Main Function
     function my(legend) {
@@ -263,11 +261,11 @@ EIS.icicle = {
     // Other Functions
     my.update = function(d) {
       legendItem.style('display', function(d1) {
-        var shouldDisplay = d1.value !== 0 && d === d1;
+        var shouldDisplay = d === d1;
         shouldDisplay = shouldDisplay || d.parent && d.parent === d1;
+        shouldDisplay = shouldDisplay || d.parent && d.parent.parent && d.parent.parent === d1;
         shouldDisplay = shouldDisplay || d1.parent && d1.parent === d;
         shouldDisplay = shouldDisplay || d1.parent && d1.parent.parent && d1.parent.parent === d;
-        shouldDisplay = shouldDisplay || d1.parent && d1.parent.parent && d1.parent.parent.parent && d1.parent.parent.parent === d;
 
         return shouldDisplay ? 'block' : 'none';
       });
@@ -295,7 +293,7 @@ EIS.icicle = {
     return my;
   },
 
-  // Dumb Icicle Table Builder
+  // Icicle Table Builder
   Tables: function() {
     // Configurable Variables
     var colors = EIS.icicle.colors;
@@ -309,8 +307,6 @@ EIS.icicle = {
     var el;
     var totalTable;
     var itemTable;
-    var nextColor = 0;
-    var nextColors = [ 1, 1, 1, 1, 1, 1];
 
     // Main Function
     function my(table) {
@@ -430,7 +426,7 @@ EIS.icicle = {
   }
 };
 
-// Intelligent Function that sets up the Account Summary Page items
+// Account Summary Page Builder
 EIS.AccountSummaryBuilder = function() {
   // Configurable Options
   var colors = EIS.icicle.colors;
