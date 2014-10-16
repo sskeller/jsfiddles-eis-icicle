@@ -43,7 +43,6 @@ EIS.icicle = {
     // Local Variables
     var el;
     var nextColor = 0;
-    var nextColors = [ 1, 1, 1, 1, 1, 1];
     var x = d3.scale.linear().range([padding, width]);
     var dx = d3.scale.linear().range([0, width-padding]);
     var y = d3.scale.linear().range([0, height]);
@@ -78,14 +77,15 @@ EIS.icicle = {
           } else if(d.depth === 1) {
             d.colorIndex = nextColor;
             d.parentColorIndex = nextColor;
+            d.parentNextColor = 1;
             d.color = colors[d.colorIndex][0];
             nextColor = (nextColor + 1) % colors.length;
           } else {
             var parentIndex = d.parent.parentColorIndex;
-            d.colorIndex = nextColors[parentIndex];
+            d.colorIndex = d.parent.parentNextColor;
             d.parentColorIndex = parentIndex;
             d.color = colors[parentIndex][d.colorIndex];
-            nextColors[parentIndex] = (nextColors[parentIndex] + 1) % colors[parentIndex].length;
+            d.parent.parentNextColor = (d.colorIndex + 1) % colors[parentIndex].length;
           }
 
           return d.color;
@@ -235,8 +235,6 @@ EIS.icicle = {
     // Local Variables
     var el;
     var legendItem;
-    var nextColor = 0;
-    var nextColors = [ 1, 1, 1, 1, 1, 1];
 
     // Main Function
     function my(legend) {
@@ -309,8 +307,6 @@ EIS.icicle = {
     var el;
     var totalTable;
     var itemTable;
-    var nextColor = 0;
-    var nextColors = [ 1, 1, 1, 1, 1, 1];
 
     // Main Function
     function my(table) {
