@@ -332,7 +332,7 @@ EIS.icicle = {
         row.append('td').text(formatDollar(d.value));
         row.append('td').text(formatDollar(d.vested));
         row.append('td').text(formatPercent(d.value ? d.vested / d.value : 0));
-        row.on('click', function() { $(table).trigger('click', d); });
+        row.on('click', function() { $(el).trigger('click', d); });
       });
     }
 
@@ -343,7 +343,7 @@ EIS.icicle = {
       var row;
       var caption = totalTable.select('caption');
       caption.on('click', function() {
-        $(table).trigger('click', d.parent ? d.parent : d);
+        $(el).trigger('click', d.parent ? d.parent : d);
       });
       caption.select('.swatch').style('background', d.color);
       caption.select('.text').text(d.name);
@@ -373,7 +373,7 @@ EIS.icicle = {
           row.append('td').text(formatDollar(d1.value));
           row.append('td').text(formatDollar(d1.vested));
           row.append('td').text(formatPercent(d1.value ? d1.vested / d1.value : 0));
-          row.on('click', function() { $(table).trigger('click', d1); });
+          row.on('click', function() { $(el).trigger('click', d1); });
         });
 
         itemTable.classed({'hide': false});
