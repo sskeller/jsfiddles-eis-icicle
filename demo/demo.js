@@ -339,7 +339,48 @@ EIS.icicle = {
 
     // Other Functions
     my.update = function(d) {
+      itemTable.classed({'table': true, 'table-striped': true});
+      var header = itemTable.select('.col-title');
+      var row;
+      var caption = totalTable.select('caption');
+      caption.on('click', function() {
+        $(table).trigger('click', d.parent ? d.parent : d);
+      });
+      caption.select('.swatch').style('background', d.color);
+      caption.select('.text').text(d.name);
+      row = totalTable.select('tbody tr');
+      row.html('');
+      row.append('td').text(formatDollar(d.value));
+      row.append('td').text(formatDollar(d.vested));
+      row.append('td').test(formatPercent(d.vested / d.value));
 
+      // TODO: Yuck make this better
+      if(d.depth === 0) {
+        header.text('Sources');
+      } else if(d.depth === 1) {
+        header.text('Funds / IPMs');
+      } else {
+        header.text('Funds');
+      }
+
+      if(d.children) {
+        itemTable.select('tbody').html('');
+        _.each(d.children, function(d1) {
+          row = itemTable.select('tbody').append('tr');
+          row.append('td').append('span')
+            .classed({'swatch': true})
+            .style('background', d1.color);
+          row.append('td').text(d1.name);
+          row.append('td').text(formatDollar(d1.values));
+          row.append('td').text(formatDolar(d1.vested));
+          row.append('td').text(formatPercent(d1.vested / d1.value));
+          row.on('click', function() { $(table).trigger('click', d1); });
+        });
+
+        itemTable.classed({'hide': false});
+      } else {
+        itemTable.classed({'hide': true});
+      }
     };
 
     // Getters/Setters
@@ -498,86 +539,6 @@ EIS.AccountSummaryBuilder = function() {
     $('head style[type="text/css"]').attr('type', 'text/less');
     less.refreshStyles();
     /*---------- End Shim ----------*/
-
-    var data = {};
-
-    var buildTable = function() {
-      var totalTable = d3.select('#total-table-old');
-      var itemTable = d3.select('#item-table-old');
-      var row;
-      var root = data[0];
-      totalTable.select('caption .swatch').style('background', root.color);
-      totalTable.select('caption .text').text(root.name);
-      row = totalTable.select('tbody tr');
-      row.append('td').text(formatDollar(root.value));
-      row.append('td').text(formatDollar(root.vested));
-      row.append('td').text(formatPercent(root.vested / root.value));
-
-      _.each(root.children, function(d) {
-        row = itemTable.select('tbody').append('tr');
-        row.append('td').append('span')
-          .classed({'swatch': true})
-          .style('background', d.color);
-        row.append('td').text(d.name);
-        row.append('td').text(formatDollar(d.value));
-        row.append('td').text(formatDollar(d.vested));
-        row.append('td').text(formatPercent(d.vested / d.value));
-        row.on('click', function() { elementClicked(d); });
-      });
-    };
-
-    var elementClicked = function(d) {
-      updateIcicle(d);
-      updateLegend(d);
-      updateTable(d);
-    };
-
-    var updateTable = function(d) {
-      var totalTable = d3.select('#total-table-old');
-      var itemTable = d3.select('#item-table-old');
-      itemTable.classed({'table': true, 'table-striped': true});
-      var header = itemTable.select('.col-title');
-      var row;
-
-      var caption = totalTable.select('caption');
-      caption.on('click', function() {
-        elementClicked(d.parent ? d.parent : d);
-      });
-      caption.select('.swatch').style('background', d.color);
-      caption.select('.text').text(d.name);
-      row = totalTable.select('tbody tr');
-      row.html('');
-      row.append('td').text(formatDollar(d.value));
-      row.append('td').text(formatDollar(d.vested));
-      row.append('td').text(formatPercent(d.vested / d.value));
-
-      if(d.depth === 0) {
-        header.text('Sources');
-      } else if(d.depth === 1) {
-        header.text('Funds / IPMs');
-      } else {
-        header.text('Funds');
-      }
-
-      if(d.children) {
-        itemTable.select('tbody').html('');
-        _.each(d.children, function(d1) {
-          row = itemTable.select('tbody').append('tr');
-          row.append('td').append('span')
-            .classed({'swatch': true})
-            .style('background', d1.color);
-          row.append('td').text(d1.name);
-          row.append('td').text(formatDollar(d1.value));
-          row.append('td').text(formatDollar(d1.vested));
-          row.append('td').text(formatPercent(d1.vested / d1.value));
-          row.on('click', function() { elementClicked(d1); });
-        });
-
-        itemTable.classed({'hide': false});
-      } else {
-        itemTable.classed({'hide': true});
-      }
-    };
 
     getData().done(function(response) {
       var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Source(s)', 'Fund(s)']);
