@@ -62,7 +62,7 @@ EIS.icicle = {
         .attr('height', '100%');
 
       rect = svg.selectAll('rect')
-        .data(data)
+        .data(data.filter(function(d) { return d.value !== 0; }))
         .enter()
         .append('rect')
         .classed({ 'clickable': true })
@@ -71,7 +71,9 @@ EIS.icicle = {
         .attr('width', function(d) { return dx(d.dx); })
         .attr('height', function(d) { return y(d.dy); })
         .attr('fill', function(d, i) {
-          if(d.depth === 0) {
+          if(d.value === 0) {
+            d.color = 'transparent';
+          } else if(d.depth === 0) {
             d.color = topColor;
           } else if(d.depth === 1) {
             d.colorIndex = nextColor;
@@ -242,7 +244,7 @@ EIS.icicle = {
       legendItem = legend
         .selectAll('li');
       legendItem = legendItem
-        .data(data)
+        .data(data.filter(function(d) { return d.value !== 0; }))
         .enter()
         .append('li');
 
@@ -261,7 +263,7 @@ EIS.icicle = {
     // Other Functions
     my.update = function(d) {
       legendItem.style('display', function(d1) {
-        var shouldDisplay = d === d1;
+        var shouldDisplay = d1.value !== 0 && d === d1;
         shouldDisplay = shouldDisplay || d.parent && d.parent === d1;
         shouldDisplay = shouldDisplay || d1.parent && d1.parent === d;
         shouldDisplay = shouldDisplay || d1.parent && d1.parent.parent && d1.parent.parent === d;
@@ -324,6 +326,9 @@ EIS.icicle = {
       row.append('td').text(formatDollar(root.vested));
       row.append('td').text(formatPercent(root.value ? root.vested / root.value : 0));
 
+      var header = itemTable.select('.col-title');
+      header.text(labels[1]);
+
       _.each(root.children, function(d) {
         row = itemTable.select('tbody').append('tr');
         row.append('td').append('span')
@@ -333,7 +338,10 @@ EIS.icicle = {
         row.append('td').text(formatDollar(d.value));
         row.append('td').text(formatDollar(d.vested));
         row.append('td').text(formatPercent(d.value ? d.vested / d.value : 0));
-        row.on('click', function() { $(el).trigger('click', d); });
+        if(d.value !== 0) {
+          row.classed({'clickable': true});
+          row.on('click', function() { $(el).trigger('click', d); });
+        }
       });
     }
 
@@ -354,7 +362,7 @@ EIS.icicle = {
       row.append('td').text(formatDollar(d.vested));
       row.append('td').text(formatPercent(d.value ? d.vested / d.value : 0));
 
-      header.text(labels[d.depth]);
+      header.text(labels[d.depth + 1]);
 
       if(d.children) {
         itemTable.select('tbody').html('');
@@ -367,7 +375,11 @@ EIS.icicle = {
           row.append('td').text(formatDollar(d1.value));
           row.append('td').text(formatDollar(d1.vested));
           row.append('td').text(formatPercent(d1.value ? d1.vested / d1.value : 0));
-          row.on('click', function() { $(el).trigger('click', d1); });
+
+          if(d1.value !== 0) {
+            row.classed({'clickable': true});
+            row.on('click', function() { $(el).trigger('click', d1); });
+          }
         });
 
         itemTable.classed({'hide': false});
@@ -457,7 +469,7 @@ EIS.AccountSummaryBuilder = function() {
       .data(icicle.data())
       .colors(colors)
       .topColor(topColor)
-      .labels(['Sources', 'Funds / IPMs', 'Funds']);
+      .labels(labels);
     tableEl.call(table);
     $(tableEl).click(update);
   }
@@ -469,12 +481,47 @@ EIS.AccountSummaryBuilder = function() {
     table.update(d);
   }
 
-  my.loadByFund = function(obj) {
+  my.byFundConverter = function(name, obj) {
+    var data = {
+      'name': name,
+      'value': obj.grandTotalValue,
+      'vested': obj.grandTotalVested,
+      'shares': obj.grandTotalShares,
+      'children': []
+    };
+    _.each(obj.statementFunds, function(fund) {
+      var child = {
+        'name': fund.description,
+        'value': fund.balance,
+        'vested': fund.vestedValue,
+        'shares': fund.shares,
+        'children': []
+      };
 
+      _.each(fund.fundSources, function(source) {
+        var grandchild = {
+          'name': source.description,
+          'value': source.value,
+          'vested': source.vested,
+          'shares': source.shares
+        };
+        child.children.push(grandchild);
+      });
+
+      data.children.push(child);
+    });
+
+    return data;
   };
 
-  my.loadBySource = function(obj) {
-
+  my.bySourceConverter = function(name, obj) {
+    var data = {
+      'name': name,
+      'value': obj.grandTotalValue,
+      'vested': obj.grandTotalVested,
+      'shares': obj.grandTotalShares,
+      'children': []
+    };
   };
 
   // Getters/Setters
@@ -519,6 +566,18 @@ EIS.AccountSummaryBuilder = function() {
     return promise;
   }
 
+  function getFundData() {
+    var promise;
+    promise = $.getJSON('demo/byfund.response.json');
+    return promise;
+  }
+
+  function getSourceData() {
+    var promise;
+    promise = $.getJSON('demo/bysource.response.json');
+    return promise;
+  }
+
   $(function() {
 
     /*---------- Shim to treat CSS panel as Less ----------*/
@@ -528,7 +587,13 @@ EIS.AccountSummaryBuilder = function() {
 
     getData().done(function(response) {
       var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Source(s)', 'Fund(s)']);
-      builder(response);
+      //builder(response);
+    });
+
+    getFundData().done(function(response) {
+      var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Fund(s)', 'Source(s)']);
+      var parsedData = builder.byFundConverter('Sample 401(k) Plan', response);
+      builder(parsedData);
     });
 
     debug.timeEnd('Start Up');
