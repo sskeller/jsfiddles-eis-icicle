@@ -4,6 +4,410 @@ var EIS = window.EIS || {};
 (function ($, _, Modernizr, less, debug, d3) {
   "use strict";
 
+// ----- NEW CODE HERE --------------------------------------------------------
+
+EIS.icicle = {
+
+  colors: [
+    ["#084594","#2171b5","#4292c6","#6baed6","#9ecae1","#c6dbef","#eff3ff"],
+    ["#99000d","#cb181d","#ef3b2c","#fb6a4a","#fc9272","#fcbba1","#fee5d9"],
+    ["#005a32","#238b45","#41ab5d","#74c476","#a1d99b","#c7e9c0","#edf8e9"],
+    ["#8c2d04","#d94801","#f16913","#fd8d3c","#fdae6b","#fdd0a2","#feedde"],
+    ["#4a1486","#6a51a3","#807dba","#9e9ac8","#bcbddc","#dadaeb","#f2f0f7"],
+    ["#91003f","#ce1256","#e7298a","#df65b0","#c994c7","#d4b9da","#f1eef6"]
+  ],
+
+  topColor: "#969696",
+
+  // Dumb Icicle Chart Builder
+  Chart: function() {
+    // Configurable Options
+    var width = 800;
+    var height = 200;
+    var padding = 100;
+    var colors = EIS.icicle.colors;
+    var topColor = EIS.icicle.topColor;
+    var partitionFunction = function(d) { return d.value; };
+    var sortFunction = function(a, b) {
+      var compare = a.x - b.x;
+      if(compare === 0) {
+        compare = a.y - b. y;
+      }
+
+      return compare;
+    };
+    var data = {};
+    var labels = ["", "", ""];
+    var duration = 750;
+
+    // Local Variables
+    var el;
+    var nextColor = 0;
+    var nextColors = [ 1, 1, 1, 1, 1, 1];
+    var x = d3.scale.linear().range([padding, width]);
+    var dx = d3.scale.linear().range([0, width-padding]);
+    var y = d3.scale.linear().range([0, height]);
+    var partition = d3.layout.partition().value(partitionFunction);
+    var svg;
+    var rect;
+
+    // Main Function
+    function my(icicle) {
+      el = icicle;
+      svg = icicle.html("")
+        .append("svg")
+        .attr("viewBox", "0 0 " + width + " " + height)
+        .attr("preserveAspectRatio", "xMidyMin")
+        .attr("width", "100%")
+        .attr("height", "100%");
+
+      rect = svg.selectAll("rect")
+        .data(data)
+        .enter()
+        .append("rect")
+        .classed({ "clickable": true })
+        .attr("x", function(d) { return x(d.x); })
+        .attr("y", function(d) { return y(d.y); })
+        .attr("width", function(d) { return dx(d.dx); })
+        .attr("height", function(d) { return y(d.dy); })
+        .attr("fill", function(d, i) {
+          if(d.depth === 0) {
+            d.color = topColor;
+          } else if(d.depth === 1) {
+            d.colorIndex = nextColor;
+            d.parentColorIndex = nextColor;
+            d.color = colors[d.colorIndex][0];
+            nextColor = (nextColor + 1) % colors.length;
+          } else {
+            var parentIndex = d.parent.parentColorIndex;
+            d.colorIndex = nextColors[parentIndex];
+            d.parentColorIndex = parentIndex;
+            d.color = colors[parentIndex][d.colorIndex];
+            nextColors[parentIndex] = (nextColors[parentIndex] + 1) % colors[parentIndex].length;
+          }
+
+          return d.color;
+        })
+      .on("click", function(d) { $(icicle).trigger("click", d); });
+
+      var d = data[0];
+      if(d.x === 0 && d.y === 0) {
+        svg.append("text")
+        .attr("x", x(0.5))
+        .attr("y", y(0.125) + 10)
+        .classed({"icicle-text": true})
+        .text(d.name);
+      }
+
+      svg.append("rect").classed({"labels": true})
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", 100)
+        .attr("height", height);
+      svg.append("text")
+        .attr("x", 0)
+        .attr("y", y(0.125) + 10)
+        .classed({"icicle-labels": true, "depth-0": true})
+        .text(labels[0]);
+      svg.append("text")
+        .attr("x", 0)
+        .attr("y", y(0.375) + 10)
+        .classed({"icicle-labels": true, "depth-1": true})
+        .text(labels[1]);
+      svg.append("text")
+        .attr("x", 0)
+        .attr("y", y(0.625) + 10)
+        .classed({"icicle-labels": true, "depth-2": true})
+        .text(labels[2]);
+    }
+
+    // Other Functions
+    my.update = function(d) {
+      x.domain([d.x, d.x + d.dx]);
+      y.domain([d.y, 1]).range([d.y ? 20 : 0, height]);
+
+      rect.transition()
+        .duration(duration)
+        .attr("x", function(d) { return x(d.x); })
+        .attr("y", function(d) { return y(d.y); })
+        .attr("width", function(d) { return x(d.x + d.dx) - x(d.x); })
+        .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); })
+        .each(function(d1) {
+          var selected = d;
+          var current = d1;
+          var label = svg.select(".depth-" + current.depth);
+
+          label.classed({"hide":
+            current.depth < selected.depth - 1 ||
+            (current.depth > selected.depth && !selected.children)});
+
+            var divisor = current.depth === selected.depth -1 ? 1 : 2;
+            label.transition().duration(duration)
+              .attr("y", y(d1.y + (d1.dy / divisor)));
+        });
+
+        var text = el.select(".icicle-text");
+        text.text(d.name);
+        if(d.depth === 0) {
+          text.transition()
+            .duration(duration)
+            .attr("y", y(0.125) + 10);
+        } else {
+          text.transition()
+            .duration(duration)
+            .attr("y", y(d.y + 0.125) + 10);
+        }
+    };
+
+    // Getters/Setters
+    my.width = function(value) {
+      if(!arguments.length) return width;
+      width = value;
+      return my;
+    };
+
+    my.height = function(value) {
+      if(!arguments.length) return height;
+      height = value;
+      return my;
+    };
+
+    my.padding = function(value) {
+      if(!arguments.length) return padding;
+      padding = value;
+      return my;
+    };
+
+    my.colors = function(value) {
+      if(!arguments.length) return colors;
+      colors = value;
+      return my;
+    };
+
+    my.topColor = function(value) {
+      if(!arguments.length) return topColor;
+      topColor = value;
+      return my;
+    };
+
+    my.partitionFunction = function(value) {
+      if(!arguments.length) return partitionFunction;
+      partitionFunction = value;
+      return my;
+    };
+
+    my.sortFunction = function(value) {
+      if(!arguments.length) return sortFunction;
+      sortFunction = value;
+      return my;
+    };
+
+    my.data = function(value) {
+      if(!arguments.length) return data;
+      data = partition(value).sort(sortFunction);
+      rollUpData(data); // TODO: Remove this once using new JSON file
+      return my;
+    };
+
+    my.labels = function(value) {
+      if(!arguments.length) return labels;
+      labels = value;
+      return my;
+    };
+
+    my.duration = function(value) {
+      if(!arguments.length) return duration;
+      duration = value;
+      return my;
+    };
+
+    return my;
+  },
+
+  // Dumb Icicle Legend Builder
+  Legend: function() {
+    // Configurable Options
+    var colors = EIS.icicle.colors;
+    var topColor = EIS.icicle.topColor;
+    var data = {};
+
+    // Local Variables
+    var nextColor = 0;
+    var nextColors = [ 1, 1, 1, 1, 1, 1];
+
+    // Main Function
+    function my(legend) {
+
+    }
+
+    // Other Functions
+    my.update = function(d) {
+
+    };
+
+    // Getters/Setters
+    my.colors = function(value) {
+      if(!arguments.length) return colors;
+      colors = value;
+      return my;
+    };
+
+    my.topColor = function(value) {
+      if(!arguments.length) return topColor;
+      topColor = value;
+      return my;
+    };
+
+    my.data = function(value) {
+      if(!arguments.length) return colors;
+      colors = value;
+      return my;
+    };
+
+    return my;
+  },
+
+  // Dumb Icicle Table Builder
+  Tables: function() {
+    // Configurable Variables
+    var colors = EIS.icicle.colors;
+    var topColor = EIS.icicle.topColor;
+    var formatPercent = d3.format(".1%");
+    var formatDollar = d3.format("$,.2f");
+    var data = {};
+
+    // Local Variables
+    var nextColor = 0;
+    var nextColors = [ 1, 1, 1, 1, 1, 1];
+
+    // Main Function
+    function my(table) {
+
+    }
+
+    // Other Functions
+    my.update = function(d) {
+
+    };
+
+    // Getters/Setters
+    my.colors = function(value) {
+      if(!arguments.length) return colors;
+      colors = value;
+      return my;
+    };
+
+    my.topColor = function(value) {
+      if(!arguments.length) return topColor;
+      topColor = value;
+      return my;
+    };
+
+    my.formatPercent = function(value) {
+      if(!arguments.length) return formatPercent;
+      formatPercent = value;
+      return my;
+    };
+
+    my.formatDollar = function(value) {
+      if(!arguments.length) return formatDollar;
+      formatDollar = value;
+      return my;
+    };
+
+    my.data = function(value) {
+      if(!arguments.length) return data;
+      data = value;
+      return my;
+    };
+
+    return my;
+  }
+};
+
+// Intelligent Function that sets up the Account Summary Page items
+EIS.AccountSummaryBuilder = function() {
+  // Configurable Options
+  var colors = EIS.icicle.colors;
+  var topColor = EIS.icicle.topColor;
+  var labels = ["", "", ""];
+
+  //Local Variables
+  var icicleEl;
+  var legendEl;
+  var tableEl;
+  var icicle;
+  var legend;
+  var table;
+
+  // Main Function
+  function my(data) {
+    icicleEl = d3.select("#icicle");
+    legendEl = d3.select("#icicle-legend");
+    tableEl = d3.select("#icicle-table");
+
+    icicle = EIS.icicle.Chart()
+      .data(data)
+      .colors(colors)
+      .topColor(topColor)
+      .labels(labels);
+    icicleEl.call(icicle);
+    $(icicleEl).click(update);
+
+    legend = EIS.icicle.Legend()
+      .data(icicle.data())
+      .colors(colors)
+      .topColor(topColor);
+    legendEl.call(legend);
+    $(legendEl).click(update);
+
+    table = EIS.icicle.Tables()
+      .data(icicle.data())
+      .colors(colors)
+      .topColor(topColor);
+    tableEl.call(table);
+    $(tableEl).click(update);
+  }
+
+  // Other Functions
+  function update(e, d) {
+    icicle.update(d);
+    legend.update(d);
+    table.update(d);
+  }
+
+  my.loadByFund = function(obj) {
+
+  };
+
+  my.loadBySource = function(obj) {
+
+  };
+
+  // Getters/Setters
+  my.colors = function(value) {
+    if(!arguments.length) return colors;
+    colors = value;
+    return my;
+  };
+
+  my.topColor = function(value) {
+    if(!arguments.length) return topColor;
+    topColor = value;
+    return my;
+  };
+
+  my.labels = function(value) {
+    if(!arguments.length) return labels;
+    labels = value;
+    return my;
+  };
+
+  return my;
+};
+
+// ----- END NEW CODE ---------------------------------------------------------
+
   _.extend(EIS, {
     colors: [
       colorbrewer.Blues["7"].reverse(),
@@ -76,7 +480,7 @@ var EIS = window.EIS || {};
 
     var data = {};
 
-    var svg = d3.select("#icicle").append("svg")
+    var svg = d3.select("#icicle-old").append("svg")
       .attr("viewBox", "0 0 " + width + " " + height)
       .attr("preserveAspectRatio", "xMinYMin");
 
@@ -115,7 +519,7 @@ var EIS = window.EIS || {};
 
         var d = data[0];
         if(d.x === 0 && d.y === 0) {
-          d3.select("#icicle svg")
+          svg
             .append("text")
             .attr("x", x(0.5))
             .attr("y", y(0.125) + 10)
@@ -151,7 +555,7 @@ var EIS = window.EIS || {};
 
     };
 
-    var legend = d3.select("#legend");
+    var legend = d3.select("#legend-old");
     var legendItem = legend.selectAll("li");
 
     var buildLegend = function() {
@@ -169,8 +573,8 @@ var EIS = window.EIS || {};
     };
 
     var buildTable = function() {
-      var totalTable = d3.select("#total-table");
-      var itemTable = d3.select("#item-table");
+      var totalTable = d3.select("#total-table-old");
+      var itemTable = d3.select("#item-table-old");
       var row;
       var root = data[0];
       totalTable.select("caption .swatch").style("background", root.color);
@@ -227,7 +631,7 @@ var EIS = window.EIS || {};
             .attr("y", y(d1.y + (d1.dy / divisor)));
         });
 
-        var text = d3.select("#icicle .icicle-text");
+        var text = d3.select("#icicle-old .icicle-text");
           text.text(d.name);
         if(d.depth === 0) {
           text.transition()
@@ -257,8 +661,8 @@ var EIS = window.EIS || {};
     };
 
     var updateTable = function(d) {
-      var totalTable = d3.select("#total-table");
-      var itemTable = d3.select("#item-table");
+      var totalTable = d3.select("#total-table-old");
+      var itemTable = d3.select("#item-table-old");
       itemTable.classed({"table": true, "table-striped": true});
       var header = itemTable.select(".col-title");
       var row;
@@ -304,9 +708,12 @@ var EIS = window.EIS || {};
     };
 
     getData().done(function(response) {
-      buildIcicles(response);
-      buildLegend();
-      buildTable();
+//      buildIcicles(response);
+//      buildLegend();
+//      buildTable();
+
+      var builder = EIS.AccountSummaryBuilder().labels(["Plan", "Source(s)", "Fund(s)"]);
+      builder(response);
     });
 
     debug.timeEnd("Start Up");
