@@ -205,7 +205,6 @@ EIS.icicle = {
     my.data = function(value) {
       if(!arguments.length) return data;
       data = partition(value).sort(sortFunction);
-      rollUpData(data); // TODO: Remove this once using new JSON file
       return my;
     };
 
@@ -322,7 +321,7 @@ EIS.icicle = {
       row = totalTable.select('tbody tr');
       row.append('td').text(formatDollar(root.value));
       row.append('td').text(formatDollar(root.vested));
-      row.append('td').text(formatPercent(root.vested / root.value));
+      row.append('td').text(formatPercent(root.value ? root.vested / root.value : 0));
 
       _.each(root.children, function(d) {
         row = itemTable.select('tbody').append('tr');
@@ -332,7 +331,7 @@ EIS.icicle = {
         row.append('td').text(d.name);
         row.append('td').text(formatDollar(d.value));
         row.append('td').text(formatDollar(d.vested));
-        row.append('td').text(formatPercent(d.vested / d.value));
+        row.append('td').text(formatPercent(d.value ? d.vested / d.value : 0));
         row.on('click', function() { $(table).trigger('click', d); });
       });
     }
@@ -352,7 +351,7 @@ EIS.icicle = {
       row.html('');
       row.append('td').text(formatDollar(d.value));
       row.append('td').text(formatDollar(d.vested));
-      row.append('td').test(formatPercent(d.vested / d.value));
+      row.append('td').text(formatPercent(d.value ? d.vested / d.value : 0));
 
       // TODO: Yuck make this better
       if(d.depth === 0) {
@@ -371,9 +370,9 @@ EIS.icicle = {
             .classed({'swatch': true})
             .style('background', d1.color);
           row.append('td').text(d1.name);
-          row.append('td').text(formatDollar(d1.values));
-          row.append('td').text(formatDolar(d1.vested));
-          row.append('td').text(formatPercent(d1.vested / d1.value));
+          row.append('td').text(formatDollar(d1.value));
+          row.append('td').text(formatDollar(d1.vested));
+          row.append('td').text(formatPercent(d1.value ? d1.vested / d1.value : 0));
           row.on('click', function() { $(table).trigger('click', d1); });
         });
 
@@ -517,20 +516,6 @@ EIS.AccountSummaryBuilder = function() {
     }
 
     return promise;
-  }
-
-  function rollUpData(data) {
-    data.reverse();
-    _.each(data, function(node) {
-      if(node.children) {
-        var sum = 0;
-        _.each(node.children, function(child) {
-          sum += child.vested;
-        });
-        node.vested = sum;
-      }
-    });
-    data.reverse();
   }
 
   $(function() {
