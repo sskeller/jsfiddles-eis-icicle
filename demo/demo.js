@@ -153,11 +153,11 @@ EIS.icicle = {
         if(d.depth === 0) {
           text.transition()
             .duration(duration)
-            .attr('y', y(0.125) + 10);
+            .attr('y', y(0.166) + 10);
         } else {
           text.transition()
             .duration(duration)
-            .attr('y', y(d.y + 0.125) + 10);
+            .attr('y', y(d.y + 0.166) + 10);
         }
     };
 
