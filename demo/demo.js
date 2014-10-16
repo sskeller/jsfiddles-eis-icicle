@@ -4,7 +4,7 @@ var EIS = window.EIS || {};
 (function ($, _, Modernizr, less, debug, d3) {
   'use strict';
 
-// ----- NEW CODE HERE --------------------------------------------------------
+// ----- START ICICLE CHART ---------------------------------------------------
 
 EIS.icicle = {
 
@@ -241,7 +241,7 @@ EIS.icicle = {
     // Main Function
     function my(legend) {
       el = legend;
-      legendItem = legend
+      legendItem = legend.html('')
         .selectAll('li');
       legendItem = legendItem
         .data(data.filter(function(d) { return d.value !== 0; }))
@@ -321,13 +321,14 @@ EIS.icicle = {
       var root = data[0];
       totalTable.select('caption .swatch').style('background', root.color);
       totalTable.select('caption .text').text(root.name);
-      row = totalTable.select('tbody tr');
+      row = totalTable.select('tbody tr').html('');
       row.append('td').text(formatDollar(root.value));
       row.append('td').text(formatDollar(root.vested));
       row.append('td').text(formatPercent(root.value ? root.vested / root.value : 0));
 
       var header = itemTable.select('.col-title');
       header.text(labels[1]);
+      itemTable.select('tbody').html('');
 
       _.each(root.children, function(d) {
         row = itemTable.select('tbody').append('tr');
@@ -571,7 +572,9 @@ EIS.AccountSummaryBuilder = function() {
   return my;
 };
 
-// ----- END NEW CODE ---------------------------------------------------------
+// ----- END ICICLE CHART -----------------------------------------------------
+
+// ----- CODE FOR DEMO ONLY BELOW ---------------------------------------------
 
   function getData() {
     var isJsFiddle = /^fiddle[.]jshell[.]net$/.test(location.host) || location.host === 'jsfiddle.net';
@@ -603,6 +606,22 @@ EIS.AccountSummaryBuilder = function() {
     return promise;
   }
 
+  function switchToFunds() {
+    getFundData().done(function(response) {
+      var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Fund(s)', 'Source(s)']);
+      var parsedData = builder.byFundConverter('Sample 401(k) Plan', response);
+      builder(parsedData);
+    });
+  }
+
+  function switchToSources() {
+    getSourceData().done(function(response) {
+      var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Source(s)', 'Funds(s)']);
+      var parsedData = builder.bySourceConverter('Sample 401(k) Plan', response);
+      builder(parsedData);
+    });
+  }
+
   $(function() {
 
     /*---------- Shim to treat CSS panel as Less ----------*/
@@ -610,22 +629,7 @@ EIS.AccountSummaryBuilder = function() {
     less.refreshStyles();
     /*---------- End Shim ----------*/
 
-//    getData().done(function(response) {
-//      var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Source(s)', 'Fund(s)']);
-//      builder(response);
-//    });
-
-//    getFundData().done(function(response) {
-//      var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Fund(s)', 'Source(s)']);
-//      var parsedData = builder.byFundConverter('Sample 401(k) Plan', response);
-//      builder(parsedData);
-//    });
-
-    getSourceData().done(function(response) {
-      var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Source(s)', 'Funds(s)']);
-      var parsedData = builder.bySourceConverter('Sample 401(k) Plan', response);
-      builder(parsedData);
-    });
+  switchToFunds();
 
     debug.timeEnd('Start Up');
   });
