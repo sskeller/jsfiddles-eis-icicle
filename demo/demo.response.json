@@ -1,8 +1,8 @@
 {
-  "name": "Sample 401(1) Plan",
+  "name": "Sample 401(1) Plan", "value": 325.00, "vested": 225.00, "shares": 890,
   "children": [
     {
-      "name": "Sample Source 1",
+      "name": "Sample Source 1", "value": 30.00, "vested": 20.00, "shares": 70,
       "children": [
         { "name": "Demo Fund 1", "value": 10.00, "vested": 5.00, "price": 0.25, "shares": 40 },
         { "name": "Demo Fund 2", "value": 15.00, "vested": 10.00, "price": 0.75, "shares": 20 },
@@ -10,13 +10,13 @@
       ]
     },
     {
-      "name": "Sample Source 2",
+      "name": "Sample Source 2", "value": 150.00, "vested": 110.00, "shares": 360,
       "children": [
         { "name": "Demo Fund 1", "value": 25.00, "vested": 20.00, "price": 0.25, "shares": 100 },
         { "name": "Demo Fund 2", "value": 15.00, "vested": 15.00, "price": 0.75, "shares": 20 },
         { "name": "Demo Fund 3", "value": 50.00, "vested": 40.00, "price": 0.50, "shares": 100 },
         {
-          "name": "Demo IPM 2",
+          "name": "Demo IPM 2", "value": 60.00, "vested": 35.00, "shares": 140,
           "children": [
             { "name": "Demo Fund 1", "value": 10.00, "vested": 10.00, "price": 0.25, "shares": 40 },
             { "name": "Demo Fund 3", "value": 50.00, "vested": 25.00, "price": 0.50, "shares": 100 }
@@ -25,10 +25,10 @@
       ]
     },
     {
-      "name": "Sample Source 3",
+      "name": "Sample Source 3", "value": 145.00, "vested": 95.00, "shares": 460,
       "children": [
         {
-          "name": "Demo IPM 1",
+          "name": "Demo IPM 1", "value": 145.00, "vested": 95.00, "shares": 460,
           "children": [
             { "name": "Demo Fund 1", "value": 100.00, "vested": 50.00, "price": 0.25, "shares": 400 },
             { "name": "Demo Fund 2", "value": 45.00, "vested": 45.00, "price": 0.75, "shares": 60 }
