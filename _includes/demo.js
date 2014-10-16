@@ -19,7 +19,7 @@ EIS.icicle = {
 
   topColor: '#969696',
 
-  // Dumb Icicle Chart Builder
+  // Icicle Chart Builder
   Chart: function() {
     // Configurable Options
     var width = 1000;
@@ -225,7 +225,7 @@ EIS.icicle = {
     return my;
   },
 
-  // Dumb Icicle Legend Builder
+  // Icicle Legend Builder
   Legend: function() {
     // Configurable Options
     var colors = EIS.icicle.colors;
@@ -263,11 +263,11 @@ EIS.icicle = {
     // Other Functions
     my.update = function(d) {
       legendItem.style('display', function(d1) {
-        var shouldDisplay = d1.value !== 0 && d === d1;
+        var shouldDisplay = d === d1;
         shouldDisplay = shouldDisplay || d.parent && d.parent === d1;
+        shouldDisplay = shouldDisplay || d.parent && d.parent.parent && d.parent.parent === d1;
         shouldDisplay = shouldDisplay || d1.parent && d1.parent === d;
         shouldDisplay = shouldDisplay || d1.parent && d1.parent.parent && d1.parent.parent === d;
-        shouldDisplay = shouldDisplay || d1.parent && d1.parent.parent && d1.parent.parent.parent && d1.parent.parent.parent === d;
 
         return shouldDisplay ? 'block' : 'none';
       });
@@ -295,7 +295,7 @@ EIS.icicle = {
     return my;
   },
 
-  // Dumb Icicle Table Builder
+  // Icicle Table Builder
   Tables: function() {
     // Configurable Variables
     var colors = EIS.icicle.colors;
@@ -430,7 +430,7 @@ EIS.icicle = {
   }
 };
 
-// Intelligent Function that sets up the Account Summary Page items
+// Account Summary Page Builder
 EIS.AccountSummaryBuilder = function() {
   // Configurable Options
   var colors = EIS.icicle.colors;
