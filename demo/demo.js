@@ -22,8 +22,8 @@ EIS.icicle = {
   // Dumb Icicle Chart Builder
   Chart: function() {
     // Configurable Options
-    var width = 800;
-    var height = 200;
+    var width = 1000;
+    var height = 300;
     var padding = 100;
     var colors = EIS.icicle.colors;
     var topColor = EIS.icicle.topColor;
@@ -96,7 +96,7 @@ EIS.icicle = {
       if(d.x === 0 && d.y === 0) {
         svg.append('text')
         .attr('x', x(0.5))
-        .attr('y', y(0.125) + 10)
+        .attr('y', y(0.166) + 10)
         .classed({'icicle-text': true})
         .text(d.name);
       }
@@ -108,17 +108,17 @@ EIS.icicle = {
         .attr('height', height);
       svg.append('text')
         .attr('x', 0)
-        .attr('y', y(0.125) + 10)
+        .attr('y', y(0.166) + 10)
         .classed({'icicle-labels': true, 'depth-0': true})
         .text(labels[0]);
       svg.append('text')
         .attr('x', 0)
-        .attr('y', y(0.375) + 10)
+        .attr('y', y(0.5) + 10)
         .classed({'icicle-labels': true, 'depth-1': true})
         .text(labels[1]);
       svg.append('text')
         .attr('x', 0)
-        .attr('y', y(0.625) + 10)
+        .attr('y', y(0.833) + 10)
         .classed({'icicle-labels': true, 'depth-2': true})
         .text(labels[2]);
     }
