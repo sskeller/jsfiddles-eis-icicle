@@ -629,7 +629,16 @@ EIS.AccountSummaryBuilder = function() {
     less.refreshStyles();
     /*---------- End Shim ----------*/
 
-  switchToFunds();
+    switchToFunds();
+
+    $('#toggle').change(function() {
+      var $this = $(this);
+      if($this.val() === 'View by Fund') {
+        switchToFunds();
+      } else if($this.val() === 'View by Source') {
+        switchToSources();
+      }
+    });
 
     debug.timeEnd('Start Up');
   });
