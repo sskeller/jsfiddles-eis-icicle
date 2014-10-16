@@ -1,5 +1,5 @@
 {
-  "name": "Sample 401(1) Plan", "value": 325.00, "vested": 225.00, "shares": 890,
+  "name": "Sample 401(k) Plan", "value": 325.00, "vested": 225.00, "shares": 890,
   "children": [
     {
       "name": "Sample Source 1", "value": 30.00, "vested": 20.00, "shares": 70,
