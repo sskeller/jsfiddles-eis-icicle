@@ -3,7 +3,8 @@ h1 {
   small { display: block; }
 }
 
-#icicle {
+#icicle,
+#icicle-old {
   width: 100%;
 
   svg {
@@ -25,7 +26,8 @@ rect {
   }
 }
 
-#legend {
+#legend-old,
+#icicle-legend {
   li {
     padding-bottom: 0.25em;
     cursor: pointer;
@@ -33,7 +35,9 @@ rect {
 }
 
 #total-table,
-#item-table {
+#item-table,
+#total-table-old,
+#item-table-old {
   width: auto;
   margin-top: 1em;
 
@@ -50,7 +54,8 @@ rect {
   th { padding-right: 2em; }
 }
 
-#item-table {
+#item-table,
+#item-table-old {
   td:first-child,
   th:first-child { padding-right: 0.5em; }
 
