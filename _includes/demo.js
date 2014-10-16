@@ -499,13 +499,13 @@ EIS.AccountSummaryBuilder = function() {
       };
 
       _.each(fund.fundSources, function(source) {
-        var grandchild = {
+        var grandChild = {
           'name': source.description,
           'value': source.value,
           'vested': source.vested,
           'shares': source.shares
         };
-        child.children.push(grandchild);
+        child.children.push(grandChild);
       });
 
       data.children.push(child);
@@ -522,6 +522,31 @@ EIS.AccountSummaryBuilder = function() {
       'shares': obj.grandTotalShares,
       'children': []
     };
+
+    _.each(obj.planInfo.sources, function(source) {
+      var child = {
+        'name': source.description,
+        'value': source.subTotalValue,
+        'vested': source.subTotalVested,
+        'shares': source.subTotalShares,
+        'children': []
+      };
+
+      _.each(source.funds, function(fund) {
+        var grandChild = {
+          'name': fund.description,
+          'value': fund.balance,
+          'vested': fund.vestedValue,
+          'shares': fund.shares
+        };
+        child.children.push(grandChild);
+      });
+
+
+      data.children.push(child);
+    });
+
+    return data;
   };
 
   // Getters/Setters
@@ -585,14 +610,20 @@ EIS.AccountSummaryBuilder = function() {
     less.refreshStyles();
     /*---------- End Shim ----------*/
 
-    getData().done(function(response) {
-      var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Source(s)', 'Fund(s)']);
-      //builder(response);
-    });
+//    getData().done(function(response) {
+//      var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Source(s)', 'Fund(s)']);
+//      builder(response);
+//    });
 
-    getFundData().done(function(response) {
-      var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Fund(s)', 'Source(s)']);
-      var parsedData = builder.byFundConverter('Sample 401(k) Plan', response);
+//    getFundData().done(function(response) {
+//      var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Fund(s)', 'Source(s)']);
+//      var parsedData = builder.byFundConverter('Sample 401(k) Plan', response);
+//      builder(parsedData);
+//    });
+
+    getSourceData().done(function(response) {
+      var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Source(s)', 'Funds(s)']);
+      var parsedData = builder.bySourceConverter('Sample 401(k) Plan', response);
       builder(parsedData);
     });
 
