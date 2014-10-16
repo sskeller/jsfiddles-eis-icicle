@@ -301,6 +301,7 @@ EIS.icicle = {
     var formatPercent = d3.format('.1%');
     var formatDollar = d3.format('$,.2f');
     var data = {};
+    var labels = ['', '', ''];
 
     // Local Variables
     var el;
@@ -353,14 +354,7 @@ EIS.icicle = {
       row.append('td').text(formatDollar(d.vested));
       row.append('td').text(formatPercent(d.value ? d.vested / d.value : 0));
 
-      // TODO: Yuck make this better
-      if(d.depth === 0) {
-        header.text('Sources');
-      } else if(d.depth === 1) {
-        header.text('Funds / IPMs');
-      } else {
-        header.text('Funds');
-      }
+      header.text(labels[d.depth]);
 
       if(d.children) {
         itemTable.select('tbody').html('');
@@ -413,6 +407,12 @@ EIS.icicle = {
       return my;
     };
 
+    my.labels = function(value) {
+      if(!arguments.length) return labels;
+      labels = value;
+      return my;
+    };
+
     return my;
   }
 };
@@ -456,7 +456,8 @@ EIS.AccountSummaryBuilder = function() {
     table = EIS.icicle.Tables()
       .data(icicle.data())
       .colors(colors)
-      .topColor(topColor);
+      .topColor(topColor)
+      .labels(['Sources', 'Funds / IPMs', 'Funds']);
     tableEl.call(table);
     $(tableEl).click(update);
   }
