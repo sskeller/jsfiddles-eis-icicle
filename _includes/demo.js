@@ -261,7 +261,15 @@ EIS.icicle = {
 
     // Other Functions
     my.update = function(d) {
+      legendItem.style('display', function(d1) {
+        var shouldDisplay = d === d1;
+        shouldDisplay = shouldDisplay || d.parent && d.parent === d1;
+        shouldDisplay = shouldDisplay || d1.parent && d1.parent === d;
+        shouldDisplay = shouldDisplay || d1.parent && d1.parent.parent && d1.parent.parent === d;
+        shouldDisplay = shouldDisplay || d1.parent && d1.parent.parent && d1.parent.parent.parent && d1.parent.parent.parent === d;
 
+        return shouldDisplay ? 'block' : 'none';
+      });
     };
 
     // Getters/Setters
@@ -468,23 +476,6 @@ EIS.AccountSummaryBuilder = function() {
 
     var data = {};
 
-    var legend = d3.select('#legend-old');
-    var legendItem = legend.selectAll('li');
-
-    var buildLegend = function() {
-      legendItem = legendItem.data(data)
-        .enter().append('li');
-      legendItem
-        .attr('class', function(d) { return 'depth-' + d.depth; })
-        .on('click', elementClicked)
-        .append('span')
-        .classed({'swatch': true})
-        .style('background-color', function(d) { return d.color; });
-      legendItem.append('span')
-        .classed({'swatch-label': true})
-        .text(function(d) { return d.name; });
-    };
-
     var buildTable = function() {
       var totalTable = d3.select('#total-table-old');
       var itemTable = d3.select('#item-table-old');
@@ -514,22 +505,6 @@ EIS.AccountSummaryBuilder = function() {
       updateIcicle(d);
       updateLegend(d);
       updateTable(d);
-    };
-
-    var updateLegend = function(d) {
-        legendItem.style('display', function(d1) {
-            var shouldDisplay = d === d1;
-            shouldDisplay = shouldDisplay || d.parent && d.parent === d1;
-            shouldDisplay = shouldDisplay || d1.parent && d1.parent === d;
-            shouldDisplay = shouldDisplay || d1.parent && d1.parent.parent && d1.parent.parent === d;
-            shouldDisplay = shouldDisplay || d1.parent && d1.parent.parent && d1.parent.parent.parent && d1.parent.parent.parent === d;
-
-            if(shouldDisplay) {
-              return 'block';
-            } else {
-              return 'none';
-            }
-          });
     };
 
     var updateTable = function(d) {
