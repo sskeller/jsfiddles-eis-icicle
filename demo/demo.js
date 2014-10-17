@@ -300,6 +300,7 @@ EIS.icicle = {
     var topColor = EIS.icicle.topColor;
     var formatPercent = d3.format('.1%');
     var formatDollar = d3.format('$,.2f');
+    var formatDecimal = d3.format(',');
     var data = {};
     var labels = ['', '', ''];
 
@@ -307,13 +308,15 @@ EIS.icicle = {
     var el;
     var totalTable;
     var itemTable;
+    var extraTable;
 
     // Main Function
     function my(table) {
       el = table;
       totalTable = table.select('#total-table');
       itemTable = table.select('#item-table');
-      var row;
+      extraTable = table.select('#extra-table');
+      var body, row;
       var root = data[0];
       totalTable.select('caption .swatch').style('background', root.color);
       totalTable.select('caption .text').text(root.name);
@@ -321,13 +324,14 @@ EIS.icicle = {
       row.append('td').text(formatDollar(root.value));
       row.append('td').text(formatDollar(root.vested));
       row.append('td').text(formatPercent(root.value ? root.vested / root.value : 0));
+      row.append('td').text(formatDecimal(root.shares));
 
       var header = itemTable.select('.col-title');
       header.text(labels[1]);
-      itemTable.select('tbody').html('');
+      body = itemTable.select('tbody').html('');
 
       _.each(root.children, function(d) {
-        row = itemTable.select('tbody').append('tr');
+        row = body.append('tr');
         row.append('td').append('span')
           .classed({'swatch': true})
           .style('background', d.color);
@@ -335,18 +339,22 @@ EIS.icicle = {
         row.append('td').text(formatDollar(d.value));
         row.append('td').text(formatDollar(d.vested));
         row.append('td').text(formatPercent(d.value ? d.vested / d.value : 0));
+        row.append('td').text(formatDecimal(d.shares));
         if(d.value !== 0) {
           row.classed({'clickable': true});
           row.on('click', function() { $(el).trigger('click', d); });
         }
       });
+
+      extraTable.classed({'hide': true});
+      table.classed({'hide': false});
     }
 
     // Other Functions
     my.update = function(d) {
       itemTable.classed({'table': true, 'table-striped': true});
       var header = itemTable.select('.col-title');
-      var row;
+      var body, row;
       var caption = totalTable.select('caption');
       caption.on('click', function() {
         $(el).trigger('click', d.parent ? d.parent : d);
@@ -358,13 +366,14 @@ EIS.icicle = {
       row.append('td').text(formatDollar(d.value));
       row.append('td').text(formatDollar(d.vested));
       row.append('td').text(formatPercent(d.value ? d.vested / d.value : 0));
+      row.append('td').text(formatDecimal(d.shares));
 
       header.text(labels[d.depth + 1]);
 
-      if(d.children) {
-        itemTable.select('tbody').html('');
+      if(d.children && d.children.length) {
+        body = itemTable.select('tbody').html('');
         _.each(d.children, function(d1) {
-          row = itemTable.select('tbody').append('tr');
+          row = body.append('tr');
           row.append('td').append('span')
             .classed({'swatch': true})
             .style('background', d1.color);
@@ -372,6 +381,7 @@ EIS.icicle = {
           row.append('td').text(formatDollar(d1.value));
           row.append('td').text(formatDollar(d1.vested));
           row.append('td').text(formatPercent(d1.value ? d1.vested / d1.value : 0));
+          row.append('td').text(formatDecimal(d1.shares));
 
           if(d1.value !== 0) {
             row.classed({'clickable': true});
@@ -382,6 +392,22 @@ EIS.icicle = {
         itemTable.classed({'hide': false});
       } else {
         itemTable.classed({'hide': true});
+      }
+
+      if(d.tabledata && d.tabledata.length) {
+        body = extraTable.select('tbody').html('');
+        _.each(d.tabledata, function(d1) {
+          row = body.append('tr');
+          row.append('td').text(d1.name);
+          row.append('td').text(formatDollar(d1.value));
+          row.append('td').text(formatDollar(d1.vested));
+          row.append('td').text(formatPercent(d1.value ? d1.vested / d1.value : 0));
+          row.append('td').text(formatDecimal(d1.shares));
+        });
+
+        extraTable.classed({'hide': false});
+      } else {
+        extraTable.classed({'hide': true});
       }
     };
 
@@ -404,11 +430,17 @@ EIS.icicle = {
       return my;
     };
 
-    my.formatDollar = function(value) {
-      if(!arguments.length) return formatDollar;
-      formatDollar = value;
-      return my;
-    };
+  my.formatDollar = function(value) {
+    if(!arguments.length) return formatDollar;
+    formatDollar = value;
+    return my;
+  };
+
+  my.formatDecimal = function(value) {
+    if(!arguments.length) return formatDecimal;
+    formatDecimal = value;
+    return my;
+  };
 
     my.data = function(value) {
       if(!arguments.length) return data;
@@ -492,7 +524,8 @@ EIS.AccountSummaryBuilder = function() {
         'value': fund.balance,
         'vested': fund.vestedValue,
         'shares': fund.shares,
-        'children': []
+        'children': [],
+        'tabledata': []
       };
 
       _.each(fund.fundSources, function(source) {
@@ -503,6 +536,16 @@ EIS.AccountSummaryBuilder = function() {
           'shares': source.shares
         };
         child.children.push(grandChild);
+      });
+
+      _.each(fund.mapIPMFund, function(ipm) {
+        var ipmGrandChild = {
+          'name': ipm.description,
+          'value': ipm.balance,
+          'vested': ipm.vestedValue,
+          'shares': ipm.shares
+        };
+        child.tabledata.push(ipmGrandChild);
       });
 
       data.children.push(child);
@@ -534,8 +577,20 @@ EIS.AccountSummaryBuilder = function() {
           'name': fund.description,
           'value': fund.balance,
           'vested': fund.vestedValue,
-          'shares': fund.shares
+          'shares': fund.shares,
+          'tabledata': []
         };
+
+        _.each(fund.mapIPMFund, function(ipm) {
+          var greatGrandChild = {
+            'name': ipm.description,
+            'value': ipm.balance,
+            'vested': ipm.vestedValue,
+            'shares': ipm.shares
+          };
+          grandChild.tabledata.push(greatGrandChild);
+        });
+
         child.children.push(grandChild);
       });
 
@@ -612,7 +667,7 @@ EIS.AccountSummaryBuilder = function() {
 
   function switchToSources() {
     getSourceData().done(function(response) {
-      var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Source(s)', 'Funds(s)']);
+      var builder = EIS.AccountSummaryBuilder().labels(['Plan', 'Source(s)', 'Fund(s)']);
       var parsedData = builder.bySourceConverter('Sample 401(k) Plan', response);
       builder(parsedData);
     });
