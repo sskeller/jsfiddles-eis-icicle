@@ -32,8 +32,8 @@ rect {
   }
 }
 
-#total-table,
-#item-table {
+#table-1,
+#table-2 {
   width: auto;
   margin-top: 1em;
 
@@ -50,7 +50,7 @@ rect {
   th { padding-right: 2em; }
 }
 
-#item-table {
+#tablel-2 {
   td:first-child,
   th:first-child { padding-right: 0.5em; }
 
